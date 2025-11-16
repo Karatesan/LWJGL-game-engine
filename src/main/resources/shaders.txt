@@ -1,0 +1,20 @@
+vertex triangle rainbow:
+#version 330 core
+layout (location = 0) in vec3 vertex_position;
+layout (location = 1) in vec3 vertex_color;
+
+uniform vec3 offset;
+out vec3 color;
+
+void main() {
+    color = vertex_color;
+    gl_Position = vec4(vertex_position.x + offset.x,-vertex_position.y+offset.y,vertex_position.z+offset.z, 1.0);
+}
+
+fragment triangle rainbow
+#version 330 core
+in vec3 color;
+out vec4 FragColor;
+void main() {
+    FragColor = vec4(color, 1.0);
+}

@@ -1,0 +1,14 @@
+#version 330 core
+layout (location = 0) in vec3 vertex_position;
+
+uniform mat4 model;
+uniform mat4 projection;
+uniform mat4 view;
+uniform vec3 color;
+
+out vec3 ColorOut;
+
+void main() {
+    gl_Position = projection * view * model * vec4(vertex_position.x, vertex_position.y,vertex_position.z, 1.0);
+    ColorOut = color;
+}
