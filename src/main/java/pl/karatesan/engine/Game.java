@@ -2,10 +2,8 @@ package pl.karatesan.engine;
 
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import pl.karatesan.engine.utils.Camera2D;
-import pl.karatesan.engine.utils.MouseHandler;
-import pl.karatesan.engine.utils.Renderer;
-import pl.karatesan.engine.utils.Window;
+import org.lwjgl.glfw.GLFWErrorCallback;
+import pl.karatesan.engine.utils.*;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -18,11 +16,25 @@ public class Game {
   private MouseHandler mouseHandler;
   private double lastTime;
   private Renderer renderer;
+  private InputHandler inputHandler;
 
   public void run() {
-    init();
-    loop();
-    window.terminateWindow();
+    if (!glfwInit()) {
+      throw new IllegalStateException("Nie udało się zainicjalizować GLFW!");
+    }
+    GLFWErrorCallback errorCallback = GLFWErrorCallback.createPrint(System.err).set();
+    try {
+      init();
+      loop();
+    } finally {
+      cleanup(errorCallback);
+    }
+  }
+
+  private void cleanup(GLFWErrorCallback errorCallback) {
+    if (window != null) window.terminateWindow();
+    glfwTerminate();
+    errorCallback.free();
   }
 
   private void init() {
@@ -31,14 +43,15 @@ public class Game {
     window = new Window(800, 600, "2D Game");
     camera2D = new Camera2D(playerPosition.x, playerPosition.y);
     mouseHandler = new MouseHandler(window.getWindowWidth(), window.getWindowHeight());
-    renderer = new Renderer(window, camera2D);
+    renderer = new Renderer(window);
+    inputHandler = new InputHandler(window);
   }
 
   private void loop() {
     lastTime = window.getTime();
 
     while (!window.windowShouldClose()) {
-      window.poolEvents();
+      window.pollEvents();
       double deltaTime = calculateDeltaTime();
 
       handleInput();
@@ -48,21 +61,19 @@ public class Game {
   }
 
   private void handleInput() {
+    inputHandler.update();
     movement.set(0, 0);
 
-    // handle mouse
-    // Vector2d offset = mouseHandler.handleMouseRotation(window.getWindow());
-
-    if (window.isKeyPressed(GLFW_KEY_W)) {
+    if (inputHandler.isKeyPressed(GLFW_KEY_W)) {
       movement.y += 1;
     }
-    if (window.isKeyPressed(GLFW_KEY_S)) {
+    if (inputHandler.isKeyPressed(GLFW_KEY_S)) {
       movement.y -= 1;
     }
-    if (window.isKeyPressed(GLFW_KEY_A)) {
+    if (inputHandler.isKeyPressed(GLFW_KEY_A)) {
       movement.x -= 1;
     }
-    if (window.isKeyPressed(GLFW_KEY_D)) {
+    if (inputHandler.isKeyPressed(GLFW_KEY_D)) {
       movement.x += 1;
     }
   }
@@ -72,10 +83,12 @@ public class Game {
       playerPosition.add(movement.normalize().mul((float) (playerSpeed * deltaTime)));
     }
     camera2D.setPosition(playerPosition.x, playerPosition.y);
+    System.out.println(playerPosition);
   }
 
   private void render() {
-    renderer.begin();
+    renderer.begin(camera2D);
+    renderer.updateProjection();
     renderer.drawQuad(playerPosition, new Vector2f(0.3f, 0.3f), new Vector3f(0.0f, 1.0f, 0.0f));
     renderer.end();
   }

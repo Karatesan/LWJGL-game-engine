@@ -11,13 +11,11 @@ public class Renderer {
 
   private Mesh quadMesh;
   private Shader shader;
-  private Camera2D camera;
   private Window window;
   private Matrix4f model;
   private Matrix4f projection;
 
-  public Renderer(Window window, Camera2D camera) {
-    this.camera = camera;
+  public Renderer(Window window) {
     this.window = window;
     projection = new Matrix4f();
     model = new Matrix4f();
@@ -48,7 +46,7 @@ public class Renderer {
     quadMesh = new Mesh(new int[] {3}, vertices, indices);
   }
 
-  public void begin() {
+  public void begin(Camera2D camera) {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     shader.setUniformM4("view", camera.getViewMatrix());
@@ -65,7 +63,7 @@ public class Renderer {
     window.swapBuffers();
   }
 
-  private void updateProjection() {
+  public void updateProjection() {
     float aspect = (float) window.getWindowWidth() / window.getWindowHeight();
     projection.identity().ortho(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
   }
