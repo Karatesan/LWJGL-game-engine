@@ -1,4 +1,4 @@
-package pl.karatesan.engine.utils;
+package pl.karatesan.engine.input;
 
 import pl.karatesan.dump.Vector2f;
 

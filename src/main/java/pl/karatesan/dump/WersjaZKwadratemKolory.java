@@ -3,8 +3,8 @@ package pl.karatesan.dump;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL15;
-import pl.karatesan.engine.utils.MovementHandler;
-import pl.karatesan.engine.utils.ShaderUtils;
+import pl.karatesan.engine.input.MovementHandler;
+import pl.karatesan.engine.shaders.ShaderUtils;
 
 import java.util.Arrays;
 

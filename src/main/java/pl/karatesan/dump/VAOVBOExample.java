@@ -6,7 +6,7 @@ import org.lwjgl.opengl.GL15;
 import org.joml.Matrix4f;
 import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
-import pl.karatesan.engine.utils.MovementHandler;
+import pl.karatesan.engine.input.MovementHandler;
 
 import java.net.URISyntaxException;
 import java.net.URL;

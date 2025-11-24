@@ -7,10 +7,9 @@ import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWScrollCallback;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL15;
-import pl.karatesan.engine.utils.Shader;
+import pl.karatesan.engine.shaders.Shader;
 import pl.karatesan.dump.Texture;
-import pl.karatesan.engine.utils.Camera3D;
-import pl.karatesan.engine.utils.MouseHandler;
+import pl.karatesan.engine.camera.Camera3D;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.GLFW_CONTEXT_VERSION_MAJOR;
@@ -251,7 +250,7 @@ public class Go3d {
     Vector3f movement = new Vector3f();
 
     // handle view
-    Vector2d offset = mouseHandler.handleMouseRotation(window);
+    Vector2d offset = mouseHandler.handleMouseOffset(window);
     camera3D.handleLook(offset.x, offset.y);
     Vector3f dir = camera3D.getDirection();
     Vector3f up = camera3D.getUp();

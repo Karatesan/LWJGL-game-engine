@@ -1,4 +1,4 @@
-package pl.karatesan.engine.utils;
+package pl.karatesan.t3d;
 
 import org.joml.Vector2d;
 
@@ -18,7 +18,7 @@ public class MouseHandler {
     this.lastY = (double) screenHeight / 2;
   }
 
-  public Vector2d handleMouseRotation(long window) {
+  public Vector2d handleMouseOffset(long window) {
     glfwGetCursorPos(window, xpos, ypos);
 
     if (firstMouse) {

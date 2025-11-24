@@ -5,7 +5,7 @@ import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL15;
-import pl.karatesan.engine.utils.Shader;
+import pl.karatesan.engine.shaders.Shader;
 
 import java.nio.FloatBuffer;
 

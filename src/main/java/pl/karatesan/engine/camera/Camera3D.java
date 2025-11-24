@@ -1,4 +1,4 @@
-package pl.karatesan.engine.utils;
+package pl.karatesan.engine.camera;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;

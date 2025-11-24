@@ -1,4 +1,4 @@
-package pl.karatesan.engine.utils;
+package pl.karatesan.engine.shaders;
 
 import java.nio.FloatBuffer;
 import java.nio.charset.StandardCharsets;

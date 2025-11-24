@@ -1,8 +1,12 @@
-package pl.karatesan.engine.utils;
+package pl.karatesan.engine.renderer;
 
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import pl.karatesan.engine.camera.Camera2D;
+import pl.karatesan.engine.shaders.Mesh;
+import pl.karatesan.engine.shaders.Shader;
+import pl.karatesan.engine.window.Window;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -13,25 +17,17 @@ public class Renderer {
   private Shader shader;
   private Window window;
   private Matrix4f model;
-  private Matrix4f projection;
+  private Camera2D camera;
 
-  public Renderer(Window window) {
+  public Renderer(Window window, Camera2D camera) {
     this.window = window;
-    projection = new Matrix4f();
     model = new Matrix4f();
-
+    this.camera = camera;
     init();
   }
 
-  private void init() {
-    try {
-      shader = new Shader("t2d/VertexShader.txt", "t2d/FragmentShader.txt");
-    } catch (RuntimeException e) {
-      System.err.println(e.getMessage());
-    }
-    shader.use();
-    updateProjection();
-    shader.setUniformM4("projection", projection);
+  private void init() throws RuntimeException {
+    shader = new Shader("t2d/VertexShader.txt", "t2d/FragmentShader.txt");
 
     float[] vertices = {
       0.5f, 0.5f, 0.0f,
@@ -46,10 +42,14 @@ public class Renderer {
     quadMesh = new Mesh(new int[] {3}, vertices, indices);
   }
 
-  public void begin(Camera2D camera) {
+  public void begin() {
+    shader.use();
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     shader.setUniformM4("view", camera.getViewMatrix());
+    if (window.consumeResizeFlag()) {
+      shader.setUniformM4("projection", camera.getUpdatedProjectionMatrix(window));
+    }
   }
 
   public void drawQuad(Vector2f position, Vector2f size, Vector3f color) {
@@ -63,8 +63,8 @@ public class Renderer {
     window.swapBuffers();
   }
 
-  public void updateProjection() {
-    float aspect = (float) window.getWindowWidth() / window.getWindowHeight();
-    projection.identity().ortho(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
+  public void cleanup() {
+    if (shader != null) shader.delete();
+    if (quadMesh != null) quadMesh.cleanup();
   }
 }

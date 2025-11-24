@@ -1,4 +1,4 @@
-package pl.karatesan.engine.utils;
+package pl.karatesan.engine.shaders;
 
 import org.lwjgl.opengl.GL15;
 
@@ -18,28 +18,29 @@ public class Mesh {
   private int strideCount;
 
   public Mesh(int[] dataSizes, float[] vertices, int[] indices) {
-
+    strideCount = 0;
     if (dataSizes == null || dataSizes.length == 0 || vertices == null || vertices.length == 0) {
       throw new IllegalArgumentException("DataSizes and vertices can't be null or empty");
+    }
+    for (int i = 0; i < dataSizes.length; i++) {
+      int dataSize = dataSizes[i];
+      if (dataSize <= 0) {
+        throw new IllegalArgumentException(
+            "DataSizes have to be greater than 0. Value at index: " + i + " = " + dataSize);
+      }
+      strideCount += dataSize;
     }
     if (indices != null) {
       if (indices.length == 0) {
         throw new IllegalArgumentException(
             "Indices array can't be empty. Set it to null if not needed");
       }
-      for (int i = 0; i < dataSizes.length; i++) {
-        int dataSize = dataSizes[i];
-        if (dataSize <= 0) {
-          throw new IllegalArgumentException(
-              "DataSizes have to be greater than 0. Value at index: " + i + " = " + dataSize);
-        }
-        strideCount += dataSize;
-      }
+      int verticesCount = vertices.length / strideCount;
       for (int i = 0; i < indices.length; i++) {
         int index = indices[i];
-        if (index < 0 || index > vertices.length / strideCount) {
+        if (index < 0 || index >= verticesCount) {
           throw new IllegalArgumentException(
-              "Invalid indice value : index = " + i + " value=" + index);
+              "Invalid index value : index = " + i + " value=" + index);
         }
       }
       this.indices = indices;

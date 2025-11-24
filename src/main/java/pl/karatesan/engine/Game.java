@@ -2,105 +2,52 @@ package pl.karatesan.engine;
 
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.lwjgl.glfw.GLFWErrorCallback;
-import pl.karatesan.engine.utils.*;
+import pl.karatesan.engine.camera.Camera2D;
+import pl.karatesan.engine.gameObjects.Player;
+import pl.karatesan.engine.gameObjects.Projectile;
+import pl.karatesan.engine.input.GenericInputHandler;
+import pl.karatesan.engine.renderer.Renderer;
 
-import static org.lwjgl.glfw.GLFW.*;
+import java.util.ArrayList;
 
 public class Game {
-  private Window window;
-  private Camera2D camera2D;
-  private Vector2f playerPosition;
-  private Vector2f movement;
-  private float playerSpeed = 0.5f;
-  private MouseHandler mouseHandler;
-  private double lastTime;
-  private Renderer renderer;
-  private InputHandler inputHandler;
+  private Camera2D camera;
+  private Player player;
+  private ArrayList<Projectile> projectiles;
 
-  public void run() {
-    if (!glfwInit()) {
-      throw new IllegalStateException("Nie udało się zainicjalizować GLFW!");
+  public Game(Camera2D camera) {
+    this.camera = camera;
+    player = new Player(new Vector2f(0, 0), 0.5f);
+    projectiles = new ArrayList<>();
+  }
+
+  public void handleInput(GenericInputHandler genericInputHandler) {
+    player.handleInput(genericInputHandler, camera);
+  }
+
+  public void update(double deltaTime) {
+    player.update(deltaTime);
+    camera.setPosition(player.getPlayerPosition());
+
+    Projectile projectile = player.tryShoot();
+    if (projectile != null) {
+      projectiles.add(projectile);
     }
-    GLFWErrorCallback errorCallback = GLFWErrorCallback.createPrint(System.err).set();
-    try {
-      init();
-      loop();
-    } finally {
-      cleanup(errorCallback);
+
+    for (int i = projectiles.size() - 1; i >= 0; i--) {
+      Projectile p = projectiles.get(i);
+      p.update(deltaTime);
+      if (p.shouldDestroy()) projectiles.remove(i);
     }
   }
 
-  private void cleanup(GLFWErrorCallback errorCallback) {
-    if (window != null) window.terminateWindow();
-    glfwTerminate();
-    errorCallback.free();
-  }
-
-  private void init() {
-    playerPosition = new Vector2f(0, 0);
-    movement = new Vector2f();
-    window = new Window(800, 600, "2D Game");
-    camera2D = new Camera2D(playerPosition.x, playerPosition.y);
-    mouseHandler = new MouseHandler(window.getWindowWidth(), window.getWindowHeight());
-    renderer = new Renderer(window);
-    inputHandler = new InputHandler(window);
-  }
-
-  private void loop() {
-    lastTime = window.getTime();
-
-    while (!window.windowShouldClose()) {
-      window.pollEvents();
-      double deltaTime = calculateDeltaTime();
-
-      handleInput();
-      update(deltaTime);
-      render();
+  public void render(Renderer renderer) {
+    renderer.begin();
+    renderer.drawQuad(
+        player.getPlayerPosition(), new Vector2f(0.3f, 0.3f), new Vector3f(0.0f, 1.0f, 0.0f));
+    for (Projectile p : projectiles) {
+      renderer.drawQuad(p.getPosition(), new Vector2f(0.1f, 0.1f), new Vector3f(1.0f, 0.0f, 0.0f));
     }
-  }
-
-  private void handleInput() {
-    inputHandler.update();
-    movement.set(0, 0);
-
-    if (inputHandler.isKeyPressed(GLFW_KEY_W)) {
-      movement.y += 1;
-    }
-    if (inputHandler.isKeyPressed(GLFW_KEY_S)) {
-      movement.y -= 1;
-    }
-    if (inputHandler.isKeyPressed(GLFW_KEY_A)) {
-      movement.x -= 1;
-    }
-    if (inputHandler.isKeyPressed(GLFW_KEY_D)) {
-      movement.x += 1;
-    }
-  }
-
-  private void update(double deltaTime) {
-    if (movement.x != 0 || movement.y != 0) {
-      playerPosition.add(movement.normalize().mul((float) (playerSpeed * deltaTime)));
-    }
-    camera2D.setPosition(playerPosition.x, playerPosition.y);
-    System.out.println(playerPosition);
-  }
-
-  private void render() {
-    renderer.begin(camera2D);
-    renderer.updateProjection();
-    renderer.drawQuad(playerPosition, new Vector2f(0.3f, 0.3f), new Vector3f(0.0f, 1.0f, 0.0f));
     renderer.end();
-  }
-
-  private double calculateDeltaTime() {
-    double currentTime = window.getTime();
-    double deltaTime = currentTime - lastTime;
-    lastTime = currentTime;
-    return deltaTime;
-  }
-
-  static void main(String[] args) {
-    new Game().run();
   }
 }
