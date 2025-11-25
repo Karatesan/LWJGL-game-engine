@@ -10,6 +10,11 @@ import pl.karatesan.engine.renderer.Renderer;
 
 import java.util.ArrayList;
 
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
+
 public class Game {
   private Camera2D camera;
   private Player player;
@@ -43,10 +48,20 @@ public class Game {
 
   public void render(Renderer renderer) {
     renderer.begin();
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, renderer.getPlayerTexture());
     renderer.drawQuad(
-        player.getPlayerPosition(), new Vector2f(0.3f, 0.3f), new Vector3f(0.0f, 1.0f, 0.0f));
+        player.getPlayerPosition(),
+        player.getAimDirection(),
+        new Vector2f(0.3f, 0.3f),
+        new Vector3f(0.0f, 1.0f, 0.0f));
+    glBindTexture(GL_TEXTURE_2D, renderer.getBulletTexture());
     for (Projectile p : projectiles) {
-      renderer.drawQuad(p.getPosition(), new Vector2f(0.1f, 0.1f), new Vector3f(1.0f, 0.0f, 0.0f));
+      renderer.drawQuad(
+          p.getPosition(),
+          p.getDirection(),
+          new Vector2f(0.1f, 0.1f),
+          new Vector3f(1.0f, 0.0f, 0.0f));
     }
     renderer.end();
   }

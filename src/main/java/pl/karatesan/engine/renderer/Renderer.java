@@ -6,6 +6,7 @@ import org.joml.Vector3f;
 import pl.karatesan.engine.camera.Camera2D;
 import pl.karatesan.engine.shaders.Mesh;
 import pl.karatesan.engine.shaders.Shader;
+import pl.karatesan.engine.texture.Texture;
 import pl.karatesan.engine.window.Window;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -18,6 +19,8 @@ public class Renderer {
   private Window window;
   private Matrix4f model;
   private Camera2D camera;
+  private Texture playerTexture;
+  private Texture bulletTexture;
 
   public Renderer(Window window, Camera2D camera) {
     this.window = window;
@@ -27,19 +30,25 @@ public class Renderer {
   }
 
   private void init() throws RuntimeException {
-    shader = new Shader("t2d/VertexShader.txt", "t2d/FragmentShader.txt");
+    shader = new Shader("t2d/VertexShaderTexture.txt", "t2d/FragmentShaderTexture.txt");
 
     float[] vertices = {
-      0.5f, 0.5f, 0.0f,
-      0.5f, -0.5f, 0.0f,
-      -0.5f, -0.5f, 0.0f,
-      -0.5f, 0.5f, 0.0f,
+      // x,    y,    z,     u,   v
+      0.5f, 0.5f, 0.0f, 1.0f, 1.0f, // Top-right
+      0.5f, -0.5f, 0.0f, 1.0f, 0.0f, // Bottom-right
+      -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, // Bottom-left
+      -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, // Top-left
     };
     int[] indices = {
       0, 1, 2,
       0, 2, 3
     };
-    quadMesh = new Mesh(new int[] {3}, vertices, indices);
+    quadMesh = new Mesh(new int[] {3, 2}, vertices, indices);
+
+    this.playerTexture = new Texture("/player.png");
+    this.bulletTexture = new Texture("/bullet.jpg");
+    shader.use();
+    shader.setUniform1i("textureSampler", 0);
   }
 
   public void begin() {
@@ -52,8 +61,9 @@ public class Renderer {
     }
   }
 
-  public void drawQuad(Vector2f position, Vector2f size, Vector3f color) {
-    model.identity().translate(position.x, position.y, 0).scale(size.x, size.y, 1);
+  public void drawQuad(Vector2f position, Vector2f aimDirection, Vector2f size, Vector3f color) {
+    float angle = (float) Math.atan2(aimDirection.y, aimDirection.x);
+    model.identity().translate(position.x, position.y, 0).rotateZ(angle).scale(size.x, size.y, 1);
     shader.setUniformM4("model", model);
     shader.setUniform3f("color", color.x, color.y, color.z);
     quadMesh.draw();
@@ -66,5 +76,13 @@ public class Renderer {
   public void cleanup() {
     if (shader != null) shader.delete();
     if (quadMesh != null) quadMesh.cleanup();
+  }
+
+  public int getPlayerTexture() {
+    return playerTexture.getTextureId();
+  }
+
+  public int getBulletTexture() {
+    return bulletTexture.getTextureId();
   }
 }

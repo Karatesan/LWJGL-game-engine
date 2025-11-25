@@ -92,7 +92,8 @@ public class GenericInputHandler {
   }
 
   public boolean isKeyReleased(int key) {
-    return !currentKeys[key] && previousKeys[key];
+    if (key > 0 && key < currentKeys.length) return !currentKeys[key] && previousKeys[key];
+    return false;
   }
 
   public Vector2d getMousePosition() {
