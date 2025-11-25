@@ -9,7 +9,7 @@ public class Player {
   private Vector2f playerPosition;
   private float playerSpeed = 0.5f;
   private Vector2f aimDirection;
-  private boolean canShot;
+  private boolean triggerPulled;
   private int health;
   private Weapon weapon; // coldown,damage,velocity
   private Vector2f movement;
@@ -41,11 +41,11 @@ public class Player {
 
   public void update(double deltaTime) {
     move(deltaTime);
+    weapon.update(deltaTime);
   }
 
   public Projectile tryShoot() {
-    if (canShot) {
-      canShot = false;
+    if (triggerPulled && weapon.canShot()) {
       return shoot();
     }
     return null;
@@ -62,14 +62,7 @@ public class Player {
   }
 
   public Projectile shoot() {
-    Projectile projectile =
-        new Projectile(
-            weapon.calculateDamage(),
-            new Vector2f(aimDirection),
-            new Vector2f(playerPosition),
-            weapon.getProjectileVelocity(),
-            weapon.getRange());
-    return projectile;
+    return weapon.shot(aimDirection, playerPosition);
   }
 
   public void handleInput(GenericInputHandler genericInputHandler, Camera2D camera) {
@@ -80,6 +73,10 @@ public class Player {
     if (genericInputHandler.isMoveRightPressed()) movement.x += 1;
     Vector2d mousePosition = genericInputHandler.getMousePosition();
     aimDirection.set(camera.convertScreenToWorld(mousePosition).sub(playerPosition)).normalize();
-    canShot = genericInputHandler.isMouseLeftJustClicked();
+    triggerPulled = genericInputHandler.isMouseLeftJustClicked();
   }
+
+    public Vector2f getAimDirection() {
+      return aimDirection;
+    }
 }

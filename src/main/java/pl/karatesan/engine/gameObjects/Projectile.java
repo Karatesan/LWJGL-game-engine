@@ -39,6 +39,10 @@ public class Projectile {
     return position;
   }
 
+  public Vector2f getDirection(){
+      return direction;
+  }
+
   @Override
   public String toString() {
     DecimalFormat df = new DecimalFormat("#.####");
