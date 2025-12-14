@@ -1,6 +1,8 @@
 package pl.karatesan.engine.gameObjects;
 
 import org.joml.Vector2f;
+import pl.karatesan.engine.texture.Texture;
+import pl.karatesan.engine.texture.TextureManager;
 
 import java.text.DecimalFormat;
 
@@ -9,12 +11,21 @@ public class Projectile {
   private Vector2f direction;
   private Vector2f origin;
   private Vector2f position;
+  private Vector2f size;
   private float velocity;
   private float range;
   private float distanceTraveled;
   private Vector2f directionBuffer;
+  private Texture texture;
 
-  public Projectile(int damage, Vector2f direction, Vector2f origin, float velocity, float range) {
+  public Projectile(
+      int damage,
+      Vector2f direction,
+      Vector2f origin,
+      float velocity,
+      float range,
+      Vector2f size,
+      Texture texture) {
     this.damage = damage;
     this.direction = direction;
     this.origin = new Vector2f(origin);
@@ -22,6 +33,8 @@ public class Projectile {
     this.velocity = velocity;
     this.range = range;
     this.directionBuffer = new Vector2f();
+    this.size = size;
+    this.texture = texture;
   }
 
   public void update(double deltaTime) {
@@ -39,8 +52,8 @@ public class Projectile {
     return position;
   }
 
-  public Vector2f getDirection(){
-      return direction;
+  public Vector2f getDirection() {
+    return direction;
   }
 
   @Override
@@ -56,5 +69,13 @@ public class Projectile {
         + " "
         + df.format(position.y)
         + '}';
+  }
+
+  public Vector2f getSize() {
+    return size;
+  }
+
+  public Texture getTexture(){
+      return texture;
   }
 }

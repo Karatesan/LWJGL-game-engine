@@ -4,23 +4,40 @@ import org.joml.Vector2d;
 import org.joml.Vector2f;
 import pl.karatesan.engine.camera.Camera2D;
 import pl.karatesan.engine.input.GenericInputHandler;
+import pl.karatesan.engine.texture.Texture;
+import pl.karatesan.engine.texture.TextureManager;
+import pl.karatesan.engine.utils.Utilities;
+
+import java.text.DecimalFormat;
 
 public class Player {
   private Vector2f playerPosition;
   private float playerSpeed = 0.5f;
   private Vector2f aimDirection;
-  private boolean triggerPulled;
   private int health;
   private Weapon weapon; // coldown,damage,velocity
   private Vector2f movement;
+  private Vector2f size;
+  private Texture texture;
 
-  public Player(Vector2f playerPosition, float playerSpeed) {
-    this.health = 100;
+  public Player(
+      Vector2f playerPosition,
+      float playerSpeed,
+      Texture texture,
+      Vector2f size,
+      int health,
+      Vector2f aimDirection) {
     this.playerPosition = playerPosition;
     this.playerSpeed = playerSpeed;
+    this.texture = texture;
+    this.size = size;
+    this.health = health;
+    this.aimDirection = aimDirection;
     this.movement = new Vector2f();
-    this.aimDirection = new Vector2f(1, 0);
-    this.weapon = new Weapon("Shotgun", 1.0f, 0.5f, 20, 50, 1);
+  }
+
+  public Vector2f getSize() {
+    return size;
   }
 
   public Vector2f getPlayerPosition() {
@@ -39,44 +56,40 @@ public class Player {
     this.playerSpeed = playerSpeed;
   }
 
+  public boolean tryShoot() {
+    return weapon.shot();
+  }
+
   public void update(double deltaTime) {
-    move(deltaTime);
-    weapon.update(deltaTime);
+    this.weapon.update(deltaTime);
   }
 
-  public Projectile tryShoot() {
-    if (triggerPulled && weapon.canShot()) {
-      return shoot();
+  public void move(double deltaTime, Vector2f movementDirection, Vector2f mousePosition) {
+    if (movementDirection.x != 0 || movementDirection.y != 0) {
+      playerPosition.add(movementDirection.mul((float) (playerSpeed * deltaTime)));
     }
-    return null;
-  }
-
-  private void move(double deltaTime) {
-    if (movement.x != 0 || movement.y != 0) {
-      playerPosition.add(movement.normalize().mul((float) (playerSpeed * deltaTime)));
-    }
+    Vector2f aim = new Vector2f();
+    mousePosition.sub(playerPosition, aim);
+    aimDirection.set(aim).normalize(); // TODO we modify here mousePosition from game
   }
 
   public void takeDamage(int damage) {
     health -= damage;
   }
 
-  public Projectile shoot() {
-    return weapon.shot(aimDirection, playerPosition);
+  public Vector2f getAimDirection() {
+    return aimDirection;
   }
 
-  public void handleInput(GenericInputHandler genericInputHandler, Camera2D camera) {
-    movement.set(0, 0);
-    if (genericInputHandler.isMoveUpPressed()) movement.y += 1;
-    if (genericInputHandler.isMoveDownPressed()) movement.y -= 1;
-    if (genericInputHandler.isMoveLeftPressed()) movement.x -= 1;
-    if (genericInputHandler.isMoveRightPressed()) movement.x += 1;
-    Vector2d mousePosition = genericInputHandler.getMousePosition();
-    aimDirection.set(camera.convertScreenToWorld(mousePosition).sub(playerPosition)).normalize();
-    triggerPulled = genericInputHandler.isMouseLeftJustClicked();
+  public Texture getTexture() {
+    return texture;
   }
 
-    public Vector2f getAimDirection() {
-      return aimDirection;
-    }
+  public void setWeapon(Weapon weapon) {
+    this.weapon = weapon;
+  }
+
+  public Weapon getWeapon() {
+    return weapon;
+  }
 }

@@ -3,65 +3,61 @@ package pl.karatesan.engine;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import pl.karatesan.engine.camera.Camera2D;
-import pl.karatesan.engine.gameObjects.Player;
-import pl.karatesan.engine.gameObjects.Projectile;
+import pl.karatesan.engine.gameObjects.*;
 import pl.karatesan.engine.input.GenericInputHandler;
 import pl.karatesan.engine.renderer.Renderer;
-
-import java.util.ArrayList;
-
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.glBindTexture;
-import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
-import static org.lwjgl.opengl.GL13.glActiveTexture;
+import pl.karatesan.engine.texture.TextureManager;
 
 public class Game {
   private Camera2D camera;
   private Player player;
-  private ArrayList<Projectile> projectiles;
+  private Ground ground;
+  private ProjectileManager projectileManager;
+  private EntityFactory entityFactory;
+  private Weapon shotgun;
+  private Weapon assaultRifle;
 
-  public Game(Camera2D camera) {
+  public Game(Camera2D camera, TextureManager textureManager) {
     this.camera = camera;
-    player = new Player(new Vector2f(0, 0), 0.5f);
-    projectiles = new ArrayList<>();
+    this.projectileManager = new ProjectileManager();
+    this.entityFactory = new EntityFactory(textureManager);
+    shotgun = entityFactory.createWeapon("shotgun", 1, 500, 30, 50, 500);
+    assaultRifle = entityFactory.createWeapon("Assault rifle", 0.1f, 500, 10, 15, 500);
+    player = entityFactory.createPlayer(new Vector2f(0, 0), 50, 100, new Vector2f(50, 50));
+    player.setWeapon(assaultRifle);
+    ground = entityFactory.createGround();
   }
 
-  public void handleInput(GenericInputHandler genericInputHandler) {
-    player.handleInput(genericInputHandler, camera);
-  }
-
-  public void update(double deltaTime) {
+  // todo bedzie trzeba colission manager, interfejs damageable z metoda takeDamage, damageManager
+  // colision manager tworzy eventy - co zostalo trafione i czym, damage handler to obsluguje
+  public void update(double deltaTime, GenericInputHandler input) {
     player.update(deltaTime);
+    player.move(
+        deltaTime, input.getMovementInput(), camera.convertScreenToWorld(input.getMousePosition()));
+    if (input.isMouseLeftDown() && player.tryShoot()) {
+      projectileManager.createProjectile(
+          player.getWeapon(), player.getAimDirection(), player.getPlayerPosition());
+    }
     camera.setPosition(player.getPlayerPosition());
-
-    Projectile projectile = player.tryShoot();
-    if (projectile != null) {
-      projectiles.add(projectile);
-    }
-
-    for (int i = projectiles.size() - 1; i >= 0; i--) {
-      Projectile p = projectiles.get(i);
-      p.update(deltaTime);
-      if (p.shouldDestroy()) projectiles.remove(i);
-    }
+    projectileManager.update(deltaTime);
   }
 
   public void render(Renderer renderer) {
     renderer.begin();
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, renderer.getPlayerTexture());
+    renderer.drawGround(ground.getPosition(), ground.getTexture(), ground.getSize());
     renderer.drawQuad(
         player.getPlayerPosition(),
         player.getAimDirection(),
-        new Vector2f(0.3f, 0.3f),
-        new Vector3f(0.0f, 1.0f, 0.0f));
-    glBindTexture(GL_TEXTURE_2D, renderer.getBulletTexture());
-    for (Projectile p : projectiles) {
+        player.getSize(),
+        null,
+        player.getTexture());
+    for (Projectile p : projectileManager.getProjectiles()) {
       renderer.drawQuad(
           p.getPosition(),
           p.getDirection(),
-          new Vector2f(0.1f, 0.1f),
-          new Vector3f(1.0f, 0.0f, 0.0f));
+          p.getSize(),
+          new Vector3f(1.0f, 0.0f, 0.0f),
+          p.getTexture());
     }
     renderer.end();
   }

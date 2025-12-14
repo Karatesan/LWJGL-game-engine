@@ -20,17 +20,21 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Window {
   private long window;
-  private int width;
-  private int height;
+  private int frameBufferWidth;
+  private int frameBufferHeight;
+  private int windowWidth;
+  private int windowHight;
   private double[] xpos = new double[1];
   private double[] ypos = new double[1];
   private Vector2d mousePosition;
   private boolean isWindowResized;
+  private final float originalAspect;
 
   public Window(int windowWidth, int windowHeight, String title) {
     this.isWindowResized = true; // initial flag state so renderer can set projection matrix
-    this.height = windowHeight;
-    this.width = windowWidth;
+    this.windowHight = windowHeight;
+    this.windowWidth = windowWidth;
+    this.originalAspect = (float) windowWidth /windowHeight;
     this.mousePosition = new Vector2d();
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -43,6 +47,7 @@ public class Window {
     }
 
     glfwSetFramebufferSizeCallback(window, this::framebufferSizeCallback);
+    glfwSetWindowSizeCallback(window, this::windowSizeCallback);
 
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // vsync (jak działa)
@@ -52,10 +57,30 @@ public class Window {
   }
 
   private void framebufferSizeCallback(long window, int width, int height) {
-    this.width = width;
-    this.height = height;
-    glViewport(0, 0, width, height); // update OpenGL viewport
+    this.frameBufferWidth = width;
+    this.frameBufferHeight = height;
+//    float newAspect = (float) width / height;
+//    int viewportW;
+//    int viewportH;
+//    int x = 0, y = 0;
+//    if (newAspect >= originalAspect) {
+//      viewportH = height;
+//      viewportW = (int) (viewportH * originalAspect);
+//      x = (width - viewportW) / 2;
+//    } else {
+//      viewportW = width;
+//      viewportH = (int) (viewportW / originalAspect
+//      );
+//      y = (height - viewportH) / 2;
+//    }
+//    glViewport(x, y, viewportW, viewportH); // update OpenGL viewport
+      glViewport(0,0,width,height);
     isWindowResized = true;
+  }
+
+  private void windowSizeCallback(long window, int width, int height) {
+    this.windowWidth = width;
+    this.windowHight = height;
   }
 
   public void swapBuffers() {
@@ -75,11 +100,11 @@ public class Window {
   }
 
   public int getWindowHeight() {
-    return height;
+    return windowHight;
   }
 
   public int getWindowWidth() {
-    return width;
+    return windowWidth;
   }
 
   public void setKeyCallback(GLFWKeyCallbackI callback) {
@@ -93,7 +118,6 @@ public class Window {
   public Vector2d getMousePosition() {
     glfwGetCursorPos(window, xpos, ypos);
     mousePosition.set(xpos[0], ypos[0]);
-    System.out.println(mousePosition);
     return mousePosition;
   }
 

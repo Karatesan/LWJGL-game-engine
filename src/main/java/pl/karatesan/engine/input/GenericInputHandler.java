@@ -1,9 +1,14 @@
 package pl.karatesan.engine.input;
 
 import org.joml.Vector2d;
+import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFWKeyCallbackI;
 import org.lwjgl.glfw.GLFWMouseButtonCallbackI;
 import pl.karatesan.engine.window.Window;
+
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -15,11 +20,16 @@ public class GenericInputHandler {
   private GLFWKeyCallbackI keyCallback;
   private GLFWMouseButtonCallbackI mouseCallback;
   private Vector2d mousePosition;
+  private Vector2f movementInput;
+  private Map<GameAction, Integer> keyMapping;
 
   public GenericInputHandler(Window w) {
     this.mousePosition = new Vector2d();
     this.currentKeys = new boolean[GLFW_KEY_LAST];
     this.previousKeys = new boolean[GLFW_KEY_LAST];
+    this.keyMapping = new HashMap<>();
+    this.movementInput = new Vector2f();
+
     keyCallback =
         (long window, int key, int scancode, int action, int mods) -> {
           if (action == GLFW_PRESS) setKeyDown(key);
@@ -36,6 +46,12 @@ public class GenericInputHandler {
           }
         };
     w.setMouseCallback(mouseCallback);
+
+    keyMapping.put(GameAction.MoveUp, GLFW_KEY_W);
+    keyMapping.put(GameAction.MoveRight, GLFW_KEY_D);
+    keyMapping.put(GameAction.MoveDown, GLFW_KEY_S);
+    keyMapping.put(GameAction.MoveLeft, GLFW_KEY_A);
+    keyMapping.put(GameAction.Shoot, GLFW_MOUSE_BUTTON_1);
   }
 
   public void update(Window window) {
@@ -59,19 +75,19 @@ public class GenericInputHandler {
   }
 
   public boolean isMoveUpPressed() {
-    return isKeyPressed(GLFW_KEY_W);
+    return isKeyPressed(keyMapping.get(GameAction.MoveUp));
   }
 
   public boolean isMoveDownPressed() {
-    return isKeyPressed(GLFW_KEY_S);
+    return isKeyPressed(keyMapping.get(GameAction.MoveDown));
   }
 
   public boolean isMoveLeftPressed() {
-    return isKeyPressed(GLFW_KEY_A);
+    return isKeyPressed(keyMapping.get(GameAction.MoveLeft));
   }
 
   public boolean isMoveRightPressed() {
-    return isKeyPressed(GLFW_KEY_D);
+    return isKeyPressed(keyMapping.get(GameAction.MoveRight));
   }
 
   public boolean isMouseLeftDown() {
@@ -106,5 +122,15 @@ public class GenericInputHandler {
 
   public boolean isPreviousLeftMouseDown() {
     return previousLeftMouseDown;
+  }
+
+  public Vector2f getMovementInput() {
+    movementInput.set(0, 0);
+    if (isMoveUpPressed()) movementInput.y += 1;
+    if (isMoveDownPressed()) movementInput.y -= 1;
+    if (isMoveLeftPressed()) movementInput.x -= 1;
+    if (isMoveRightPressed()) movementInput.x += 1;
+    if (movementInput.x != 0 || movementInput.y != 0) movementInput.normalize();
+    return movementInput;
   }
 }

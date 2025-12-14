@@ -1,6 +1,7 @@
 package pl.karatesan.engine.gameObjects;
 
 import org.joml.Vector2f;
+import pl.karatesan.engine.texture.Texture;
 
 public class Weapon {
   private String name;
@@ -11,6 +12,7 @@ public class Weapon {
   private float range;
   private float currentCooldown;
   private boolean isOnCooldown;
+  private Texture projectileTexture;
 
   public Weapon(
       String name,
@@ -18,7 +20,8 @@ public class Weapon {
       float projectileVelocity,
       int minDamage,
       int maxDamage,
-      float range) {
+      float range,
+      Texture projectileTexture) {
     this.name = name;
     this.weaponCooldown = weaponCooldown;
     this.projectileVelocity = projectileVelocity;
@@ -27,6 +30,7 @@ public class Weapon {
     this.range = range;
     this.currentCooldown = 0;
     this.isOnCooldown = false;
+    this.projectileTexture = projectileTexture;
   }
 
   public String getName() {
@@ -59,16 +63,15 @@ public class Weapon {
     }
   }
 
-  public Projectile shot(Vector2f aimDirection, Vector2f playerPosition) {
+  public boolean shot() {
     if (!isOnCooldown) {
-        isOnCooldown = true;
-      return new Projectile(
-          calculateDamage(),
-          new Vector2f(aimDirection),
-          new Vector2f(playerPosition).add(new Vector2f(aimDirection).mul(0.15f)),
-          getProjectileVelocity(),
-          getRange());
+      isOnCooldown = true;
+      return true;
     }
-    return null;
+    return false;
+  }
+
+  public Texture getProjectileTexture() {
+    return projectileTexture;
   }
 }

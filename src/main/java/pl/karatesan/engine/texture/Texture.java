@@ -26,9 +26,11 @@ import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 public class Texture {
 
   private int textureId;
+  public static final int REPEAT = GL_REPEAT;
+  public static final int CLAMP = GL_CLAMP_TO_EDGE;
 
-  public Texture(String path) {
-
+  public Texture(String path, int wrapType) {
+    ByteBuffer image;
     try (MemoryStack stack = MemoryStack.stackPush()) {
 
       IntBuffer width = stack.mallocInt(1);
@@ -39,10 +41,10 @@ public class Texture {
 
       URL resource = getClass().getResource(path);
       if (resource == null) {
-        throw new IllegalStateException("Texture not found in resources: /sprite.png");
+        throw new IllegalStateException("Texture not found in: " + path);
       }
       Path imagePath = Paths.get(resource.toURI());
-      ByteBuffer image = STBImage.stbi_load(imagePath.toString(), width, height, channels, 4);
+      image = STBImage.stbi_load(imagePath.toString(), width, height, channels, 4);
       if (image == null) {
         throw new RuntimeException("Failed to load image: " + STBImage.stbi_failure_reason());
       }
@@ -51,12 +53,13 @@ public class Texture {
 
       glBindTexture(GL_TEXTURE_2D, textureId);
       // What happens if UV goes outside [0,1] range?
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); // Clamp horizontal
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); // Clamp vertical
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapType); // Clamp horizontal
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapType); // Clamp vertical
 
       // What happens if quad is drawn larger/smaller than texture resolution?
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // Pixelated when scaled up
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // Pixelated when scaled down
+      glTexParameteri(
+          GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // Pixelated when scaled down
       glTexImage2D(
           GL_TEXTURE_2D,
           0,
@@ -68,11 +71,10 @@ public class Texture {
           GL_UNSIGNED_BYTE,
           image);
       glGenerateMipmap(GL_TEXTURE_2D);
-
-      STBImage.stbi_image_free(image);
+      if (image != null) STBImage.stbi_image_free(image);
     } catch (Exception e) {
-      throw new RuntimeException(
-          "Something went wrong during processing texture, " + e.getMessage());
+      cleanup();
+      throw new RuntimeException("Failed to load: " + path, e);
     }
   }
 
@@ -82,5 +84,9 @@ public class Texture {
 
   public int getTextureId() {
     return textureId;
+  }
+
+  public void cleanup() {
+    if (textureId != 0) glDeleteTextures(textureId);
   }
 }

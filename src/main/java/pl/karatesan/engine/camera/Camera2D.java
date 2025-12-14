@@ -4,25 +4,31 @@ import org.joml.Matrix4f;
 import org.joml.Vector2d;
 import org.joml.Vector2f;
 import org.joml.Vector4d;
+import pl.karatesan.engine.utils.Utilities;
 import pl.karatesan.engine.window.Window;
 
 public class Camera2D {
   private static final float MIN_ZOOM = 0.1f;
   private static final float MAX_ZOOM = 10.0f;
+  private static final float PROJECTION_WIDTH = 800;
+  private static final float PROJECTION_HEIGHT = 600;
+
   private Vector2f position;
   private float zoom;
   private Matrix4f view;
   private Matrix4f projection;
   private Window window;
   private boolean positionChanged;
-  private Matrix4f projectionViewMatrix = new Matrix4f();
-  private Vector4d clipCoords = new Vector4d();
+  private Matrix4f projectionViewMatrix;
+  private Vector4d clipCoords;
+  private Vector2f mouseWorldPosition;
 
   public Camera2D(float positionX, float positionY, Window window) {
     this.projectionViewMatrix = new Matrix4f();
     this.clipCoords = new Vector4d();
     this.positionChanged = false;
     this.window = window;
+    this.mouseWorldPosition = new Vector2f();
     position = new Vector2f(positionX, positionY);
     projection = new Matrix4f();
     zoom = 1.0f;
@@ -38,23 +44,43 @@ public class Camera2D {
   }
 
   public Matrix4f getUpdatedProjectionMatrix(Window window) {
-    float aspect = (float) window.getWindowWidth() / window.getWindowHeight();
-    projection.identity().ortho(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
+    /*
+    This changes the way we generate projection - it always matches
+    window size and when we lose aspect then displayed things get skewed
+    */
+
+    float width = window.getWindowWidth();
+    float height = window.getWindowHeight();
+    projection.identity().ortho(-width / 2, width / 2, -height / 2, height / 2, -1, 1);
+
+    /*
+    we use constant dimensions for projection calculation
+       projection
+           .identity()
+           .ortho(
+               -PROJECTION_WIDTH / 2,
+               PROJECTION_WIDTH / 2,
+               -PROJECTION_HEIGHT / 2,
+               PROJECTION_HEIGHT / 2,
+               -1,
+               1);
+    */
     return projection;
   }
 
   public Vector2f convertScreenToWorld(Vector2d mouseCoords) {
     int width = window.getWindowWidth();
     int height = window.getWindowHeight();
-
     double xNDC = 2 * mouseCoords.x / (double) width - 1;
     double yNDC = -2 * mouseCoords.y / (double) height + 1;
     clipCoords.set(xNDC, yNDC, 0, 1);
     projection.mul(view, projectionViewMatrix);
     projectionViewMatrix.invert();
     clipCoords.mul(projectionViewMatrix);
-
-    return new Vector2f((float) clipCoords.x, (float) clipCoords.y);
+    mouseWorldPosition.set((float) clipCoords.x, (float) clipCoords.y);
+    Utilities.printVector2WithDelay(160, mouseWorldPosition, "Mouse World Position: ");
+    Utilities.printVector2WithDelay(160, mouseCoords, "Mouse  Position: ");
+    return new Vector2f(mouseWorldPosition);
   }
 
   public void zoom(float zoomOffset) {
