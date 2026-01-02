@@ -56,6 +56,7 @@ public class Renderer {
     quadTiledMesh = new Mesh(new int[] {3, 2}, quadTiledVertices, null);
     shader.use();
     shader.setUniform1i("textureSampler", 0);
+    shader.setUniformM4("projection", camera.getUpdatedProjectionMatrix(window));
   }
 
   public void begin() {
@@ -63,9 +64,10 @@ public class Renderer {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     shader.setUniformM4("view", camera.getViewMatrix());
-    if (window.consumeResizeFlag()) {
-      shader.setUniformM4("projection", camera.getUpdatedProjectionMatrix(window));
-    }
+    //
+//    if (window.consumeResizeFlag()) {
+//      shader.setUniformM4("projection", camera.getUpdatedProjectionMatrix(window));
+//    }
   }
 
   public void drawQuad(
@@ -81,14 +83,14 @@ public class Renderer {
     quadMesh.draw();
   }
 
-  public void drawGround(Vector2f position, Texture texture,Vector2f size) {
-      model.identity().translate(position.x, position.y, 0).scale(size.x, size.y, 1);
-      shader.setUniformM4("model", model);
-      if (texture != null) {
-          glActiveTexture(GL_TEXTURE0);
-          texture.bindTexture();
-      }
-      quadTiledMesh.draw();
+  public void drawGround(Vector2f position, Texture texture, Vector2f size) {
+    model.identity().translate(position.x, position.y, 0).scale(size.x, size.y, 1);
+    shader.setUniformM4("model", model);
+    if (texture != null) {
+      glActiveTexture(GL_TEXTURE0);
+      texture.bindTexture();
+    }
+    quadTiledMesh.draw();
   }
 
   public void end() {

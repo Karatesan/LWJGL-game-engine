@@ -4,14 +4,15 @@ import org.joml.Matrix4f;
 import org.joml.Vector2d;
 import org.joml.Vector2f;
 import org.joml.Vector4d;
+import pl.karatesan.engine.utils.RandomService;
 import pl.karatesan.engine.utils.Utilities;
 import pl.karatesan.engine.window.Window;
 
 public class Camera2D {
   private static final float MIN_ZOOM = 0.1f;
   private static final float MAX_ZOOM = 10.0f;
-  private static final float PROJECTION_WIDTH = 800;
-  private static final float PROJECTION_HEIGHT = 600;
+  private final int PROJECTION_WIDTH;
+  private final int PROJECTION_HEIGHT;
 
   private Vector2f position;
   private float zoom;
@@ -22,13 +23,23 @@ public class Camera2D {
   private Matrix4f projectionViewMatrix;
   private Vector4d clipCoords;
   private Vector2f mouseWorldPosition;
+  private ShakeCamUtility shakeCamUtility;
+  private RandomService randomService;
 
-  public Camera2D(float positionX, float positionY, Window window) {
+  public Camera2D(
+      float positionX,
+      float positionY,
+      Window window,
+      RandomService randomService) {
     this.projectionViewMatrix = new Matrix4f();
     this.clipCoords = new Vector4d();
     this.positionChanged = false;
     this.window = window;
     this.mouseWorldPosition = new Vector2f();
+    this.shakeCamUtility = new ShakeCamUtility(randomService);
+    this.randomService = randomService;
+    this.PROJECTION_WIDTH = window.getProjectionWidth();
+    this.PROJECTION_HEIGHT = window.getProjectionHeight();
     position = new Vector2f(positionX, positionY);
     projection = new Matrix4f();
     zoom = 1.0f;
@@ -47,24 +58,26 @@ public class Camera2D {
     /*
     This changes the way we generate projection - it always matches
     window size and when we lose aspect then displayed things get skewed
-    */
 
-    float width = window.getWindowWidth();
+       float width = window.getWindowWidth();
     float height = window.getWindowHeight();
     projection.identity().ortho(-width / 2, width / 2, -height / 2, height / 2, -1, 1);
+    */
 
     /*
     we use constant dimensions for projection calculation
-       projection
-           .identity()
-           .ortho(
-               -PROJECTION_WIDTH / 2,
-               PROJECTION_WIDTH / 2,
-               -PROJECTION_HEIGHT / 2,
-               PROJECTION_HEIGHT / 2,
-               -1,
-               1);
-    */
+     */
+
+    projection
+        .identity()
+        .ortho(
+            (float) -PROJECTION_WIDTH / 2,
+            (float) PROJECTION_WIDTH / 2,
+            (float) -PROJECTION_HEIGHT / 2,
+            (float) PROJECTION_HEIGHT / 2,
+            -1,
+            1);
+
     return projection;
   }
 
@@ -93,5 +106,31 @@ public class Camera2D {
   public void setPosition(Vector2f position) {
     this.position.set(position);
     positionChanged = true;
+  }
+
+  public void setPosition(float x, float y) {
+    this.position.set(x, y);
+    positionChanged = true;
+  }
+
+  public void update(double deltaTime, Vector2f position) {
+    Vector2f offset = shakeCamUtility.calculateShakeOffset(deltaTime);
+    setPosition(position.x + offset.x, position.y + offset.y);
+  }
+
+  public void startShake(int magnitude) {
+    shakeCamUtility.startShake(magnitude);
+  }
+
+  public Vector2f getPosition() {
+    return position;
+  }
+
+  public int getViewWidth() {
+    return PROJECTION_WIDTH;
+  }
+
+  public int getViewHeigh() {
+    return PROJECTION_HEIGHT;
   }
 }

@@ -4,13 +4,19 @@ import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import pl.karatesan.engine.camera.Camera2D;
 import pl.karatesan.engine.input.GenericInputHandler;
+import pl.karatesan.engine.managers.CollisionManager;
 import pl.karatesan.engine.renderer.Renderer;
 import pl.karatesan.engine.texture.TextureManager;
+import pl.karatesan.engine.utils.RandomService;
 import pl.karatesan.engine.window.Window;
 
 import static org.lwjgl.glfw.GLFW.*;
 
 public class Engine {
+
+  private static final int PROJECTION_WIDTH = 1600;
+  private static final int PROJECTION_HEIGHT = 900;
+
   private Window window;
   private Renderer renderer;
   private GenericInputHandler genericInputHandler;
@@ -18,18 +24,20 @@ public class Engine {
   private Game game;
   private double lastTime;
   private TextureManager textureManager;
+  private RandomService randomService;
 
   public void init(int windowWidth, int windowHeight) {
     if (!glfwInit()) {
       throw new IllegalStateException("GLFW failed to initiate!");
     }
     errorCallback = GLFWErrorCallback.createPrint(System.err).set();
-    window = new Window(windowWidth, windowHeight, "2D Game");
-    Camera2D camera = new Camera2D(0, 0, window);
+    randomService = new RandomService(System.currentTimeMillis());
+    window = new Window(windowWidth, windowHeight, "2D Game", PROJECTION_WIDTH, PROJECTION_HEIGHT);
+    Camera2D camera = new Camera2D(0, 0, window, randomService);
     renderer = new Renderer(window, camera);
     genericInputHandler = new GenericInputHandler(window);
     textureManager = new TextureManager();
-    game = new Game(camera, textureManager);
+    game = new Game(camera, textureManager, randomService);
   }
 
   public void gameLoop() {

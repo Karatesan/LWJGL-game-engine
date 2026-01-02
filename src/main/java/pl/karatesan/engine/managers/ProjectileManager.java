@@ -1,10 +1,17 @@
-package pl.karatesan.engine.gameObjects;
+package pl.karatesan.engine.managers;
 
 import org.joml.Vector2f;
+import pl.karatesan.engine.gameObjects.Projectile;
+import pl.karatesan.engine.gameObjects.RangedWeapon;
+import pl.karatesan.engine.gameObjects.Team;
+import pl.karatesan.engine.gameObjects.WeaponType;
+import pl.karatesan.engine.utils.RandomService;
+
 import java.util.ArrayList;
 
 public class ProjectileManager {
 
+  private RandomService randomService;
   private ArrayList<Projectile> projectiles;
   private Vector2f offsetBuffer;
   private Vector2f projectileAngleBuffer;
@@ -12,26 +19,29 @@ public class ProjectileManager {
   private final float shotgunSpread = 70;
   private final float coneAngle = 0.4f;
   private final int pelletCount = 5;
-  private final float rifleSpreadCone = .2f;
+  private final float rifleSpreadCone = .08f;
 
-  public ProjectileManager() {
+  public ProjectileManager(RandomService randomService) {
     this.projectiles = new ArrayList<>();
     this.offsetBuffer = new Vector2f();
     this.projectileAngleBuffer = new Vector2f();
+    this.randomService = randomService;
   }
 
-  public void createProjectile(Weapon weapon, Vector2f aimDirection, Vector2f playerPosition) {
+  public void createProjectile(
+          RangedWeapon weapon, Vector2f aimDirection, Vector2f entityPosition, Team team) {
     Vector2f direction = new Vector2f(aimDirection);
-    direction.mul(100.0f, offsetBuffer); // TODO hardcoded half of player size
-    Vector2f origin = new Vector2f(playerPosition).add(offsetBuffer);
-    if (weapon.getName().equals("shotgun"))
-      createShotgunPellets(weapon, direction, origin, pelletCount);
-    else if (weapon.getName().equals("Assault rifle")) {
-      createAssaultRiffleProjectile(weapon, direction, origin);
+    // direction.mul(100.0f, offsetBuffer); // TODO hardcoded half of player size
+    Vector2f origin = new Vector2f(entityPosition).add(direction);
+    if (weapon.getType().equals(WeaponType.SHOTGUN))
+      createShotgunPellets(weapon, direction, origin, pelletCount, team);
+    else if (weapon.getType().equals(WeaponType.ASSAULT_RIFLE)) {
+      createAssaultRiffleProjectile(weapon, direction, origin, team);
     }
   }
 
-  private void generateProjectile(Weapon weapon, Vector2f direction, Vector2f origin) {
+  private void generateProjectile(
+      RangedWeapon weapon, Vector2f direction, Vector2f origin, Team team) {
     Projectile projectile =
         new Projectile(
             weapon.calculateDamage(),
@@ -39,8 +49,9 @@ public class ProjectileManager {
             origin,
             weapon.getProjectileVelocity(),
             weapon.getRange(),
-            new Vector2f(15, 15),
-            weapon.getProjectileTexture());
+            new Vector2f(5, 5),
+            weapon.getProjectileTexture(),
+            team);
     projectiles.add(projectile);
   }
 
@@ -62,7 +73,7 @@ public class ProjectileManager {
    * @param numberOfPellets The total number of projectiles to generate (e.g., 5).
    */
   private void createShotgunPellets(
-      Weapon weapon, Vector2f direction, Vector2f origin, int numberOfPellets) {
+      RangedWeapon weapon, Vector2f direction, Vector2f origin, int numberOfPellets, Team team) {
     if (numberOfPellets < 3)
       throw new IllegalArgumentException(
           "Number of pellets shot from shotgun must be higher than 2.");
@@ -78,32 +89,38 @@ public class ProjectileManager {
       perpendicularDir.mul(sin, projectileAngleBuffer);
       pelletDirection.add(projectileAngleBuffer).normalize();
 
-      float randPelletOrigin = (float) Math.random() * shotgunSpread;
+      float randPelletOrigin = randomService.randFloat() * shotgunSpread;
 
       pelletDirection.mul(randPelletOrigin, tempDirectionBuffer);
 
       Vector2f finalPelletOrigin = new Vector2f();
       origin.add(tempDirectionBuffer, finalPelletOrigin);
 
-      generateProjectile(weapon, pelletDirection, finalPelletOrigin);
+      generateProjectile(weapon, pelletDirection, finalPelletOrigin, team);
     }
   }
 
-  private void createAssaultRiffleProjectile(Weapon weapon, Vector2f direction, Vector2f origin) {
-    Vector2f perpendicularDir = new Vector2f(-direction.y, direction.x);
+  private void createAssaultRiffleProjectile(
+      RangedWeapon weapon, Vector2f direction, Vector2f origin, Team team) {
+    //    Vector2f perpendicularDir = new Vector2f(-direction.y, direction.x);
     Vector2f bulletDirection = new Vector2f();
-    float angle = (float) Math.random() * rifleSpreadCone - 0.1f;
+    //    float angle = randomService.randFloat() * rifleSpreadCone - 0.1f;
+    //
+    //    float cos = (float) Math.cos(angle);
+    //    float sin = (float) Math.sin(angle);
+    //    direction.mul(cos, bulletDirection);
+    //    perpendicularDir.mul(sin, projectileAngleBuffer);
+    //    bulletDirection.add(projectileAngleBuffer).normalize();
+    //
 
-    float cos = (float) Math.cos(angle);
-    float sin = (float) Math.sin(angle);
-    direction.mul(cos, bulletDirection);
-    perpendicularDir.mul(sin, projectileAngleBuffer);
-    bulletDirection.add(projectileAngleBuffer).normalize();
-
+    float x = (float) randomService.nextGaussian() * rifleSpreadCone;
+    float y = (float) randomService.nextGaussian() * rifleSpreadCone;
+    bulletDirection.x = direction.x + x;
+    bulletDirection.y = direction.y + y;
+    bulletDirection.normalize();
     Vector2f finalPelletOrigin = new Vector2f();
     origin.add(bulletDirection, finalPelletOrigin);
-
-    generateProjectile(weapon, bulletDirection, finalPelletOrigin);
+    generateProjectile(weapon, bulletDirection, finalPelletOrigin, team);
   }
 
   public void update(double deltaTime) {

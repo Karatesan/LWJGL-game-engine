@@ -2,7 +2,6 @@ package pl.karatesan.engine.gameObjects;
 
 import org.joml.Vector2f;
 import pl.karatesan.engine.texture.Texture;
-import pl.karatesan.engine.texture.TextureManager;
 
 import java.text.DecimalFormat;
 
@@ -17,6 +16,8 @@ public class Projectile {
   private float distanceTraveled;
   private Vector2f directionBuffer;
   private Texture texture;
+  private Team team;
+  private boolean destroyed;
 
   public Projectile(
       int damage,
@@ -25,7 +26,8 @@ public class Projectile {
       float velocity,
       float range,
       Vector2f size,
-      Texture texture) {
+      Texture texture,
+      Team team) {
     this.damage = damage;
     this.direction = direction;
     this.origin = new Vector2f(origin);
@@ -35,6 +37,8 @@ public class Projectile {
     this.directionBuffer = new Vector2f();
     this.size = size;
     this.texture = texture;
+    this.team = team;
+    this.destroyed = false;
   }
 
   public void update(double deltaTime) {
@@ -45,11 +49,15 @@ public class Projectile {
   }
 
   public boolean shouldDestroy() {
-    return distanceTraveled >= range;
+    return distanceTraveled >= range || destroyed;
   }
 
   public Vector2f getPosition() {
     return position;
+  }
+
+  public void destroyProjectile() {
+    destroyed = true;
   }
 
   public Vector2f getDirection() {
@@ -75,7 +83,19 @@ public class Projectile {
     return size;
   }
 
-  public Texture getTexture(){
-      return texture;
+  public Texture getTexture() {
+    return texture;
+  }
+
+  public Team getTeam() {
+    return team;
+  }
+
+  public int getDamage() {
+    return damage;
+  }
+
+  public boolean isDestroyed() {
+    return destroyed;
   }
 }

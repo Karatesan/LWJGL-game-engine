@@ -7,7 +7,11 @@ public class TextureManager {
   private Map<String, Texture> textures;
 
   public TextureManager() {
-    this.textures = new HashMap<>();
+
+      this.textures = new HashMap<>();
+      String path = "/Blood.png";
+      Texture texture = new Texture(path, Texture.CLAMP);
+      textures.put(path,texture);
   }
 
   public Texture load(String path) {

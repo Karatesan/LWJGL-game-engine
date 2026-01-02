@@ -1,10 +1,10 @@
 package pl.karatesan.engine.gameObjects;
 
-import org.joml.Vector2f;
 import pl.karatesan.engine.texture.Texture;
+import pl.karatesan.engine.utils.RandomService;
 
-public class Weapon {
-  private String name;
+public class RangedWeapon {
+  private WeaponType type;
   private int maxDamage;
   private int minDamage;
   private float projectileVelocity;
@@ -13,16 +13,18 @@ public class Weapon {
   private float currentCooldown;
   private boolean isOnCooldown;
   private Texture projectileTexture;
+  private RandomService randomService;
 
-  public Weapon(
-      String name,
+  public RangedWeapon(
+      WeaponType type,
       float weaponCooldown,
       float projectileVelocity,
       int minDamage,
       int maxDamage,
       float range,
-      Texture projectileTexture) {
-    this.name = name;
+      Texture projectileTexture,
+      RandomService randomService) {
+    this.type = type;
     this.weaponCooldown = weaponCooldown;
     this.projectileVelocity = projectileVelocity;
     this.minDamage = minDamage;
@@ -31,10 +33,11 @@ public class Weapon {
     this.currentCooldown = 0;
     this.isOnCooldown = false;
     this.projectileTexture = projectileTexture;
+    this.randomService = randomService;
   }
 
-  public String getName() {
-    return name;
+  public WeaponType getType() {
+    return type;
   }
 
   public float getProjectileVelocity() {
@@ -42,7 +45,7 @@ public class Weapon {
   }
 
   public int calculateDamage() {
-    return (int) (Math.random() * (maxDamage - minDamage + 1) + minDamage);
+    return randomService.randIntInRange(minDamage, maxDamage);
   }
 
   public float getRange() {
@@ -73,5 +76,11 @@ public class Weapon {
 
   public Texture getProjectileTexture() {
     return projectileTexture;
+  }
+
+  public void scaleWeapon(int scalar) {
+    this.weaponCooldown *= scalar * 2;
+    this.projectileVelocity /= (scalar * 2);
+    this.range /= scalar;
   }
 }
