@@ -1,0 +1,43 @@
+    //    enemyManager.spawnEnemy(EnemyType.ENEMY_WITH_RIFFLE, position, player.getPosition());
+    //    float new_x = (float) (position.x * Math.cos(-Math.PI/2) - position.y *
+    // Math.sin(-Math.PI/2));
+    //    float new_y = (float) (position.y * Math.cos(-Math.PI/2) + position.x +
+    // Math.sin(-Math.PI/2));
+    //
+    //      Vector2f pos2 = new Vector2f(new_x,new_y);
+    //    enemyManager.spawnEnemy(EnemyType.ENEMY_WITH_RIFFLE, pos2, player.getPosition());
+
+    //    Vector2f pos1 = new Vector2f();
+    //    player.getAimDirection().mul(100, pos1);
+    //    Vector2f perp = new Vector2f(pos1.y, -pos1.x);
+    // enemyManager.spawnEnemy(EnemyType.ENEMY_WITH_RIFFLE, pos1, player.getPosition());
+    // enemyManager.spawnEnemy(EnemyType.ENEMY_WITH_RIFFLE, perp, player.getPosition());
+
+    //    Vector2f orgBuffer = new Vector2f();
+    //    Vector2f perpBuffer = new Vector2f();
+    //    float startAngle = (float) (-Math.PI / 4);
+    //    float step = (float) (Math.PI / 4);
+    //    for (int i = 0; i < 3; i++) {
+    //      float ang = i * step + startAngle;
+    //      System.out.println(ang);
+    //      float sin = (float) Math.sin(ang);
+    //      float cos = (float) Math.cos(ang);
+    //
+    //      pos1.mul(cos, orgBuffer);
+    //      perp.mul(sin, perpBuffer);
+    //      Vector2f between = new Vector2f();
+    //      orgBuffer.add(perpBuffer, between);
+    //      Utilities.printVector2(between, "Between: ");
+    //      enemyManager.spawnEnemy(EnemyType.ENEMY_WITH_RIFFLE, between, player.getPosition());
+    //    }
+    /*
+    WYPROWADZANIE WZORU NA X I Y PO OBROCIE
+        x = l*cos(a)
+        y = l*sin(a)
+        x_new = l*cos(a+b)  cos(a)(cos(b) - sin(a)sin(b)
+        y_new = l*sin(a+b)  sin(a)cos(b) + cos(a)sin(b)
+
+        x_new = l * (cos(a)(cos(b) - sin(a)sin(b)) = l*cos(a)(cos(b) - l* sin(a)sin(b) = x* cos(b) - y*sin(b)
+        y_new = l * ( sin(a)cos(b) + cos(a)sin(b)) = l* sin(a)cos(b) + l* cos(a)sin(b) = y*cos(b) + x*sin(b)
+
+         */

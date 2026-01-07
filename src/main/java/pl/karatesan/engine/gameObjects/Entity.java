@@ -11,6 +11,7 @@ public abstract class Entity {
   protected Vector2f size;
   protected boolean isAlive;
   protected Texture texture;
+  protected Team team;
 
   public Entity(
       Vector2f position,
@@ -28,8 +29,9 @@ public abstract class Entity {
     this.texture = texture;
   }
 
-  public void takeDamage(int damage) {
+  public void takeDamage(int damage, Vector2f pushback) {
     health -= damage;
+    position.add(pushback);
   }
 
   public Vector2f getPosition() {
@@ -82,5 +84,13 @@ public abstract class Entity {
 
   public void setIsAlive(boolean alive) {
     this.isAlive = alive;
+  }
+
+  public Team getTeam() {
+    return team;
+  }
+
+  public void setTeam(Team team) {
+    this.team = team;
   }
 }

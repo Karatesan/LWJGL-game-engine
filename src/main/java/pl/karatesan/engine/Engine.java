@@ -11,6 +11,7 @@ import pl.karatesan.engine.utils.RandomService;
 import pl.karatesan.engine.window.Window;
 
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.*;
 
 public class Engine {
 

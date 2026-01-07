@@ -7,6 +7,7 @@ public class Player extends Entity {
   private RangedWeapon weapon; // coldown,damage,velocity
   private boolean wasHit;
   private int lastHitDamage;
+  private Vector2f moveBuffer;
 
   public Player(
       Vector2f position,
@@ -17,12 +18,15 @@ public class Player extends Entity {
       Vector2f aimDirection) {
     super(position, speed, aimDirection, health, size, texture);
     this.wasHit = false;
+    this.moveBuffer = new Vector2f();
+    this.team = Team.PLAYER;
   }
 
   @Override
-  public void takeDamage(int damage) {
+  public void takeDamage(int damage, Vector2f pushback) {
     health -= damage;
     wasHit = true;
+    this.lastHitDamage = damage;
     if (health <= 0) {
       isAlive = false;
     }
@@ -39,7 +43,7 @@ public class Player extends Entity {
 
   public void move(double deltaTime, Vector2f movementDirection) {
     if (movementDirection.x != 0 || movementDirection.y != 0) {
-      position.add(movementDirection.mul((float) (speed * deltaTime)));
+      position.add(movementDirection.mul((float) (speed * deltaTime), moveBuffer));
     }
   }
 
@@ -60,11 +64,11 @@ public class Player extends Entity {
     return wasHit;
   }
 
-    public int getLastHitDamage() {
-        return lastHitDamage;
-    }
+  public int getLastHitDamage() {
+    return lastHitDamage;
+  }
 
-    public void setLastHitDamage(int lastHitDamage) {
-        this.lastHitDamage = lastHitDamage;
-    }
+  public void setLastHitDamage(int lastHitDamage) {
+    this.lastHitDamage = lastHitDamage;
+  }
 }

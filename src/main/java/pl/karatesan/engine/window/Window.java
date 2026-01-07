@@ -15,7 +15,8 @@ import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 import static org.lwjgl.glfw.GLFW.glfwShowWindow;
 import static org.lwjgl.glfw.GLFW.glfwSwapInterval;
 import static org.lwjgl.glfw.GLFW.glfwWindowHint;
-import static org.lwjgl.opengl.GL11.glViewport;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Window {
@@ -38,7 +39,7 @@ public class Window {
     this.isWindowResized = true; // initial flag state so renderer can set projection matrix
     this.windowHight = windowHeight;
     this.windowWidth = windowWidth;
-    this.frameBufferHeight = windowHeight * 2; //TODO hardcoded retina scale
+    this.frameBufferHeight = windowHeight * 2; // TODO hardcoded retina scale
     this.frameBufferWidth = windowWidth * 2;
     this.originalAspect = (float) projectionWidth / projectionHeight;
     this.mousePosition = new Vector2d();
@@ -60,6 +61,8 @@ public class Window {
     glfwSwapInterval(1); // vsync (jak działa)
     glfwShowWindow(window);
     GL.createCapabilities();
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     calculateViewport(frameBufferWidth, frameBufferHeight);
   }
 

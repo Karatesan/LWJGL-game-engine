@@ -6,8 +6,13 @@ import org.joml.Vector3f;
 import pl.karatesan.engine.camera.Camera2D;
 import pl.karatesan.engine.shaders.Mesh;
 import pl.karatesan.engine.shaders.Shader;
+import pl.karatesan.engine.text.FontAtlas;
+import pl.karatesan.engine.text.FontGlyph;
+import pl.karatesan.engine.text.Text;
 import pl.karatesan.engine.texture.Texture;
 import pl.karatesan.engine.window.Window;
+
+import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -17,6 +22,7 @@ public class Renderer {
 
   private Mesh quadMesh;
   private Mesh quadTiledMesh;
+  private Mesh fontMesh;
   private Shader shader;
   private Window window;
   private Matrix4f model;
@@ -39,6 +45,7 @@ public class Renderer {
       -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, // Bottom-left
       -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, // Top-left
     };
+
     float[] quadTiledVertices = {
       // x,    y,    z,     u,   v
       0.5f, 0.5f, 0.0f, 50.125f, 50.125f, // Top-right
@@ -48,12 +55,14 @@ public class Renderer {
       -0.5f, 0.5f, 0.0f, 0.0f, 50.125f, // Top-left
       0.5f, 0.5f, 0.0f, 50.125f, 50.125f // Top-right
     };
+
     int[] indices = {
       0, 1, 2,
       0, 2, 3
     };
-    quadMesh = new Mesh(new int[] {3, 2}, quadVertices, indices);
-    quadTiledMesh = new Mesh(new int[] {3, 2}, quadTiledVertices, null);
+    quadMesh = new Mesh(new int[] {3, 2}, quadVertices, indices, false);
+    fontMesh = new Mesh(new int[] {3, 2}, true);
+    quadTiledMesh = new Mesh(new int[] {3, 2}, quadTiledVertices, null, false);
     shader.use();
     shader.setUniform1i("textureSampler", 0);
     shader.setUniformM4("projection", camera.getUpdatedProjectionMatrix(window));
@@ -64,10 +73,10 @@ public class Renderer {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     shader.setUniformM4("view", camera.getViewMatrix());
-    //
-//    if (window.consumeResizeFlag()) {
-//      shader.setUniformM4("projection", camera.getUpdatedProjectionMatrix(window));
-//    }
+    // not needed since we use fixed projection resolution, does not change when resizing window
+    //    if (window.consumeResizeFlag()) {
+    //      shader.setUniformM4("projection", camera.getUpdatedProjectionMatrix(window));
+    //    }
   }
 
   public void drawQuad(
@@ -81,6 +90,18 @@ public class Renderer {
       texture.bindTexture();
     }
     quadMesh.draw();
+  }
+
+  public void drawText(Vector2f position, Text text, FontAtlas atlas) {
+    model.identity().scale(text.getScale(), text.getScale(), 1);
+    shader.setUniformM4("model", model);
+    if (atlas.getFontTexture() != null) {
+      glActiveTexture(GL_TEXTURE0);
+      atlas.getFontTexture().bindTexture();
+    }
+    fontMesh.updateVBO(position, text.getGlyphs(), atlas.getScaleW(), atlas.getScaleH(), atlas.getBase());
+
+    fontMesh.draw();
   }
 
   public void drawGround(Vector2f position, Texture texture, Vector2f size) {

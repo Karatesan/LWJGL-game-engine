@@ -17,6 +17,7 @@ public abstract class Enemy extends Entity {
       Texture texture) {
     super(position, speed, aimDirection, health, size, texture);
     this.weapon = weapon;
+    this.team = Team.ENEMY;
   }
 
   public abstract void update(double deltaTime, Vector2f playerPosition);
@@ -24,6 +25,14 @@ public abstract class Enemy extends Entity {
   public abstract void move(double deltaTime);
 
   public abstract boolean tryAttack();
+
+  @Override
+  public void takeDamage(int damage, Vector2f pushback) {
+    super.takeDamage(damage, pushback);
+    if (health <= 0) {
+      isAlive = false;
+    }
+  }
 
   public RangedWeapon getWeapon() {
     return weapon;
@@ -40,6 +49,4 @@ public abstract class Enemy extends Entity {
   public void setInRange(boolean inRange) {
     this.inRange = inRange;
   }
-
-
 }

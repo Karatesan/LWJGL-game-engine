@@ -6,10 +6,9 @@ import pl.karatesan.engine.texture.Texture;
 import pl.karatesan.engine.texture.TextureManager;
 import pl.karatesan.engine.utils.RandomService;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class EnemyManager {
+public class SpawnManager {
 
   private List<Enemy> enemies;
   private final TextureManager textureManager;
@@ -21,7 +20,8 @@ public class EnemyManager {
   private Vector2f aimDirectionBuffer;
   private EnemyType[] enemyType;
 
-  public EnemyManager(
+  public SpawnManager(
+      List<Enemy> enemies,
       TextureManager textureManager,
       WeaponFactory weaponFactory,
       ProjectileManager projectileManager,
@@ -30,7 +30,7 @@ public class EnemyManager {
     this.weaponFactory = weaponFactory;
     this.projectileManager = projectileManager;
     this.randomService = randomService;
-    this.enemies = new ArrayList<>();
+    this.enemies = enemies;
     this.hitPositionBuffer = new Vector2f();
     this.positionBuffer = new Vector2f();
     this.aimDirectionBuffer = new Vector2f();
@@ -77,7 +77,7 @@ public class EnemyManager {
     for (int i = 0; i < enemyNumber; i++) {
       double maxAngle = Math.PI * 2;
       double angle = randomService.randomDoubleInRange(0, maxAngle);
-      positionBuffer.x = (float) (playerPosition.x + Math.cos(angle) * radius );
+      positionBuffer.x = (float) (playerPosition.x + Math.cos(angle) * radius);
       positionBuffer.y = (float) (playerPosition.y + Math.sin(angle) * radius);
       int randIndex = randomService.randIntInRange(0, enemyType.length - 1);
       this.spawnEnemy(enemyType[randIndex], positionBuffer, playerPosition);
@@ -93,18 +93,5 @@ public class EnemyManager {
 
   public List<Enemy> getEnemies() {
     return enemies;
-  }
-
-  // apply damage and wobble entiry during hit
-  public void takeHit(Enemy enemy, int damage, Vector2f projectileDirection) {
-    int weaponPower = 2;
-    enemy.takeDamage(damage);
-    float x = randomService.randFloatInRange(-1.0f, 1.0f);
-    float y = randomService.randFloatInRange(-1.0f, 1.0f);
-    hitPositionBuffer.set(projectileDirection.x + x, projectileDirection.y + y).mul(weaponPower);
-    enemy.getPosition().add(hitPositionBuffer);
-    if (enemy.getHealth() <= 0) {
-      enemy.setIsAlive(false);
-    }
   }
 }
