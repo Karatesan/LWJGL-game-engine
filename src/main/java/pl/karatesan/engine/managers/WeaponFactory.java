@@ -1,9 +1,8 @@
 package pl.karatesan.engine.managers;
 
-import pl.karatesan.engine.gameObjects.RangedWeapon;
 import pl.karatesan.engine.gameObjects.Team;
-import pl.karatesan.engine.gameObjects.WeaponType;
-import pl.karatesan.engine.texture.Texture;
+import pl.karatesan.engine.gameObjects.weapons.AssaultRifle;
+import pl.karatesan.engine.gameObjects.weapons.Shotgun;
 import pl.karatesan.engine.texture.TextureManager;
 import pl.karatesan.engine.utils.RandomService;
 
@@ -16,31 +15,13 @@ public class WeaponFactory {
     this.randomService = randomService;
   }
 
-  public RangedWeapon createWeapon(WeaponType type, Team team) {
-    // weapon has no texture yet
-    // weapon is created maneuall now, later ll introduce file with JSON data of all weapons
-    switch (type) {
-      case SHOTGUN -> {
-        return createShotgun(team);
-      }
-      case ASSAULT_RIFLE -> {
-        return createAssaultRiffle(team);
-      }
-      default -> {
-        return null;
-      }
-    }
-  }
-
-  private RangedWeapon createShotgun(Team team) {
+  public Shotgun createShotgun(Team team) {
     switch (team) {
       case PLAYER -> {
-        return createRangedWeapon(
-            WeaponType.SHOTGUN, 1, 250, 30, 50, 250, textureManager.load("/bullet.jpg"));
+        return new Shotgun(1f, textureManager.load("/bullet.jpg"), 30, 50, 250, 250);
       }
       case ENEMY -> {
-        return createRangedWeapon(
-            WeaponType.SHOTGUN, 2, 200, 30, 50, 250, textureManager.load("/bullet.jpg"));
+        return new Shotgun(1f, textureManager.load("/bullet.jpg"), 30, 50, 200, 250);
       }
       default -> {
         return null;
@@ -48,31 +29,19 @@ public class WeaponFactory {
     }
   }
 
-  private RangedWeapon createAssaultRiffle(Team team) {
+  public AssaultRifle createAssaultRiffle(Team team) {
     switch (team) {
       case PLAYER -> {
-        return createRangedWeapon(
-            WeaponType.ASSAULT_RIFLE, 0.1f, 600, 10, 15, 500, textureManager.load("/bullet.jpg"));
+        return new AssaultRifle(
+            0.1f, textureManager.load("/bullet.jpg"), 10, 15, 600, 500);
       }
       case ENEMY -> {
-        return createRangedWeapon(
-            WeaponType.ASSAULT_RIFLE, 1.0f, 200, 10, 15, 300, textureManager.load("/bullet.jpg"));
+        return new AssaultRifle(
+            1f, textureManager.load("/bullet.jpg"), 10, 15, 200, 300);
       }
       default -> {
         return null;
       }
     }
-  }
-
-  private RangedWeapon createRangedWeapon(
-      WeaponType type,
-      float cooldown,
-      float velocity,
-      int minDamage,
-      int maxDamage,
-      float range,
-      Texture bulletTexture) {
-    return new RangedWeapon(
-        type, cooldown, velocity, minDamage, maxDamage, range, bulletTexture, randomService);
   }
 }

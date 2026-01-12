@@ -27,11 +27,23 @@ public class Renderer {
   private Window window;
   private Matrix4f model;
   private Camera2D camera;
+  private Matrix4f viewForUI;
+  private Matrix4f projectionForUI;
 
   public Renderer(Window window, Camera2D camera) {
     this.window = window;
     model = new Matrix4f();
     this.camera = camera;
+    this.viewForUI = new Matrix4f();
+    this.projectionForUI =
+        new Matrix4f()
+            .ortho(
+                0f,
+                (float) window.getViewportWidth(),
+                0,
+                (float) window.getViewportHeight(),
+                -1,
+                1);
     init();
   }
 
@@ -73,6 +85,8 @@ public class Renderer {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     shader.setUniformM4("view", camera.getViewMatrix());
+    shader.setUniformM4("projection", camera.getUpdatedProjectionMatrix(window));
+
     // not needed since we use fixed projection resolution, does not change when resizing window
     //    if (window.consumeResizeFlag()) {
     //      shader.setUniformM4("projection", camera.getUpdatedProjectionMatrix(window));
@@ -92,15 +106,30 @@ public class Renderer {
     quadMesh.draw();
   }
 
-  public void drawText(Vector2f position, Text text, FontAtlas atlas) {
-    model.identity().scale(text.getScale(), text.getScale(), 1);
+  public void beginRenderStaticUI() {
+    shader.setUniformM4("view", viewForUI);
+    shader.setUniformM4("projection", projectionForUI);
+  }
+
+  public void drawText(Text text, FontAtlas atlas) {
+    model
+        .identity()
+        .translate(text.getPosition().x, text.getPosition().y, 0)
+        .scale(text.getScale(), text.getScale(), 1);
     shader.setUniformM4("model", model);
     if (atlas.getFontTexture() != null) {
       glActiveTexture(GL_TEXTURE0);
       atlas.getFontTexture().bindTexture();
     }
-    fontMesh.updateVBO(position, text.getGlyphs(), atlas.getScaleW(), atlas.getScaleH(), atlas.getBase());
-
+    if (text.isUpdated()) {
+      fontMesh.updateVBO(
+          text.getPosition(),
+          text.getGlyphs(),
+          atlas.getScaleW(),
+          atlas.getScaleH(),
+          atlas.getBase());
+      text.flushUpdate();
+    }
     fontMesh.draw();
   }
 

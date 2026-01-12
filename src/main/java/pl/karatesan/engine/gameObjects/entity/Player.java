@@ -1,10 +1,13 @@
-package pl.karatesan.engine.gameObjects;
+package pl.karatesan.engine.gameObjects.entity;
 
 import org.joml.Vector2f;
+import pl.karatesan.engine.context.World;
+import pl.karatesan.engine.gameObjects.Team;
+import pl.karatesan.engine.gameObjects.weapons.Weapon;
 import pl.karatesan.engine.texture.Texture;
 
 public class Player extends Entity {
-  private RangedWeapon weapon; // coldown,damage,velocity
+  private Weapon weapon; // coldown,damage,velocity
   private boolean wasHit;
   private int lastHitDamage;
   private Vector2f moveBuffer;
@@ -16,7 +19,7 @@ public class Player extends Entity {
       Vector2f size,
       int health,
       Vector2f aimDirection) {
-    super(position, speed, aimDirection, health, size, texture);
+    super(position, speed, aimDirection, health, size, Team.PLAYER, texture);
     this.wasHit = false;
     this.moveBuffer = new Vector2f();
     this.team = Team.PLAYER;
@@ -32,11 +35,11 @@ public class Player extends Entity {
     }
   }
 
-  public boolean tryShoot() {
-    return weapon.shot();
+  public void tryShoot(World world) {
+     weapon.tryShoot(world,position,aimDirection,Team.PLAYER);
   }
 
-  public void update(double deltaTime) {
+  public void update(World world, double deltaTime) {
     this.weapon.update(deltaTime);
     this.wasHit = false;
   }
@@ -52,11 +55,11 @@ public class Player extends Entity {
     aimDirection.normalize();
   }
 
-  public void setWeapon(RangedWeapon weapon) {
+  public void setWeapon(Weapon weapon) {
     this.weapon = weapon;
   }
 
-  public RangedWeapon getWeapon() {
+  public Weapon getWeapon() {
     return weapon;
   }
 

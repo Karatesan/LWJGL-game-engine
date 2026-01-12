@@ -2,6 +2,9 @@ package pl.karatesan.engine.managers;
 
 import org.joml.Vector2f;
 import pl.karatesan.engine.gameObjects.*;
+import pl.karatesan.engine.gameObjects.entity.Enemy;
+import pl.karatesan.engine.gameObjects.entity.Entity;
+import pl.karatesan.engine.gameObjects.entity.Player;
 import pl.karatesan.engine.utils.RandomService;
 
 import java.util.List;
@@ -17,7 +20,7 @@ public class CollisionManager {
   }
 
   public void handleProjectileHits(
-      List<Enemy> entities, List<Projectile> projectiles, Player player) {
+          List<Entity> entities, List<Projectile> projectiles, Player player) {
     for (Projectile p : projectiles) {
       if (p.isDestroyed()) continue;
       if (p.getTeam() != player.getTeam() && entityHitCollision(p, player)) {

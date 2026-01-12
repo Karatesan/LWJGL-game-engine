@@ -1,6 +1,9 @@
 package pl.karatesan.engine.text;
 
+import org.joml.Vector2f;
+
 import java.util.List;
+import java.util.Vector;
 
 public class Text {
 
@@ -9,12 +12,35 @@ public class Text {
   private String text;
   private FontAtlas atlas;
   private float scale;
+  private Vector2f position;
+  private float height;
+  private float width;
+  private UIAnchor anchor;
 
-  public Text(String text, FontAtlas fontAtlas) {
+  public Text(
+      String text, UIAnchor anchor, float xOffset, float yOffset, FontAtlas fontAtlas, HUD hud) {
+    this(text, anchor, xOffset, yOffset, fontAtlas, 1, hud);
+  }
+
+  public Text(
+      String text,
+      UIAnchor anchor,
+      float xOffset,
+      float yOffset,
+      FontAtlas atlas,
+      float scale,
+      HUD hud) {
     this.text = text;
+    this.anchor = anchor;
+    this.height = atlas.getLineHeight() * scale;
+    glyphs = atlas.getGlyphsForText(text);
+    for (FontGlyph glyph : glyphs) {
+      width += glyph.getWidth();
+    }
+    width*=scale;
+    this.position = hud.getPosition(anchor, xOffset, yOffset, width, height);
+    this.scale = scale;
     isUpdated = true;
-    glyphs = fontAtlas.getGlyphsForText(text);
-    scale = 1;
   }
 
   public List<FontGlyph> getGlyphs() {
@@ -29,8 +55,14 @@ public class Text {
     return isUpdated;
   }
 
-  public void setUpdated(boolean updated) {
-    isUpdated = updated;
+  public void flushUpdate() {
+    isUpdated = false;
+  }
+
+  public void update(String newText, FontAtlas fontAtlas) {
+    this.text = newText;
+    glyphs = fontAtlas.getGlyphsForText(text);
+    isUpdated = true;
   }
 
   public String getText() {
@@ -47,5 +79,9 @@ public class Text {
 
   public void setScale(float scale) {
     this.scale = scale;
+  }
+
+  public Vector2f getPosition() {
+    return position;
   }
 }

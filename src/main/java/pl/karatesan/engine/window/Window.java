@@ -26,6 +26,10 @@ public class Window {
   private int frameBufferHeight;
   private int windowWidth;
   private int windowHight;
+  int viewportWidth;
+  int viewportHeight;
+  int viewportX = 0;
+  int viewportY = 0;
   private double[] xpos = new double[1];
   private double[] ypos = new double[1];
   private Vector2d mousePosition;
@@ -77,19 +81,16 @@ public class Window {
 
   private void calculateViewport(int frameBufferWidth, int frameBufferHeight) {
     float newAspect = (float) frameBufferWidth / frameBufferHeight;
-    int viewportW;
-    int viewportH;
-    int x = 0, y = 0;
     if (newAspect >= originalAspect) {
-      viewportH = frameBufferHeight;
-      viewportW = (int) (viewportH * originalAspect);
-      x = (frameBufferWidth - viewportW) / 2;
+      viewportHeight = frameBufferHeight;
+      viewportWidth = (int) (viewportHeight * originalAspect);
+      viewportX = (frameBufferWidth - viewportWidth) / 2;
     } else {
-      viewportW = frameBufferWidth;
-      viewportH = (int) (viewportW / originalAspect);
-      y = (frameBufferHeight - viewportH) / 2;
+      viewportWidth = frameBufferWidth;
+      viewportHeight = (int) (viewportWidth / originalAspect);
+      viewportY = (frameBufferHeight - viewportHeight) / 2;
     }
-    glViewport(x, y, viewportW, viewportH); // update OpenGL viewport
+    glViewport(viewportX, viewportY, viewportWidth, viewportHeight); // update OpenGL viewport
 
     // when we resize framebuffer and projection to window size.
     // compared to current implementation with resize of window field of view gets bigger
@@ -153,5 +154,21 @@ public class Window {
 
   public int getProjectionHeight() {
     return PROJECTION_HEIGHT;
+  }
+
+  public int getViewportWidth() {
+    return viewportWidth;
+  }
+
+  public int getViewportHeight() {
+    return viewportHeight;
+  }
+
+  public int getViewportX() {
+    return viewportX;
+  }
+
+  public int getViewportY() {
+    return viewportY;
   }
 }

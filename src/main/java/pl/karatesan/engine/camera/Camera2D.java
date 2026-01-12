@@ -26,11 +26,7 @@ public class Camera2D {
   private ShakeCamUtility shakeCamUtility;
   private RandomService randomService;
 
-  public Camera2D(
-      float positionX,
-      float positionY,
-      Window window,
-      RandomService randomService) {
+  public Camera2D(float positionX, float positionY, Window window, RandomService randomService) {
     this.projectionViewMatrix = new Matrix4f();
     this.clipCoords = new Vector4d();
     this.positionChanged = false;
@@ -132,5 +128,9 @@ public class Camera2D {
 
   public int getViewHeigh() {
     return PROJECTION_HEIGHT;
+  }
+
+  public Window getWindow() {
+    return window;
   }
 }

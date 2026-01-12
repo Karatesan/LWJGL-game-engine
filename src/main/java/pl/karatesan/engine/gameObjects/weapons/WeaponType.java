@@ -1,4 +1,4 @@
-package pl.karatesan.engine.gameObjects;
+package pl.karatesan.engine.gameObjects.weapons;
 
 public enum WeaponType {
     SHOTGUN,

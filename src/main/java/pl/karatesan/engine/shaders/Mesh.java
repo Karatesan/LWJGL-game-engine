@@ -20,7 +20,7 @@ public class Mesh {
   private float[] vertices;
   private int[] indices;
   private int strideCount;
-  private final int maxGlyphs = 100;
+  private final int maxGlyphs = 200;
   private final int floatsPerVertex = 5;
   private final int verticesPerGlyph = 6;
   private final int bytesPerGlyph = floatsPerVertex * verticesPerGlyph * Float.BYTES;
@@ -121,7 +121,7 @@ public class Mesh {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
   }
 
-  public void updateVBO(
+  public int updateVBO(
       Vector2f position, List<FontGlyph> glyphs, float scaleW, float scaleH, float baseline) {
     if (glyphs.size() > maxGlyphs)
       throw new RuntimeException(
@@ -130,8 +130,8 @@ public class Mesh {
               + ", max allowed: "
               + maxGlyphs);
 
-    float penX = position.x;
-    float penY = position.y;
+    float penX = 0;
+    float penY = 0;
     int arrPosition = 0;
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -186,6 +186,7 @@ public class Mesh {
     }
     verticesToDraw = glyphs.size() * floatsPerVertex * verticesPerGlyph;
     glBufferSubData(GL_ARRAY_BUFFER, 0, vertices);
+    return arrPosition;
   }
 
   public void draw() {

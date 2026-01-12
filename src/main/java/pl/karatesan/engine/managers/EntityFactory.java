@@ -1,10 +1,10 @@
 package pl.karatesan.engine.managers;
 
 import org.joml.Vector2f;
-import pl.karatesan.engine.gameObjects.EnemyWithRangedWeapon;
+import pl.karatesan.engine.gameObjects.entity.EnemyWithRangedWeapon;
 import pl.karatesan.engine.gameObjects.Ground;
-import pl.karatesan.engine.gameObjects.Player;
-import pl.karatesan.engine.gameObjects.RangedWeapon;
+import pl.karatesan.engine.gameObjects.entity.Player;
+import pl.karatesan.engine.gameObjects.weapons.Weapon;
 import pl.karatesan.engine.texture.Texture;
 import pl.karatesan.engine.texture.TextureManager;
 
@@ -28,7 +28,7 @@ public class EntityFactory {
   }
 
   public EnemyWithRangedWeapon createEnemyWithRiffle(
-      Vector2f position, Vector2f playerPosition, RangedWeapon weapon) {
+      Vector2f position, Vector2f playerPosition, Weapon weapon) {
     Texture texture = textureManager.load("/sprite.png");
     Vector2f aim = new Vector2f();
     playerPosition.sub(position, aim);

@@ -10,7 +10,7 @@ public class Vector2fUtils {
 //    result.x = (float) (Math.cos(angle) * radius);
 //    result.y = (float) (Math.sin(angle) * radius);
 //  }
-
+//
 //    public Vector2f wobbleAfterHit( Vector2f projectileDirection, float weaponPower){
 //        float x = randomService.randFloatInRange(-1.0f, 1.0f);
 //        float y = randomService.randFloatInRange(-1.0f, 1.0f);

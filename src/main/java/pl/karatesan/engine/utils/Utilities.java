@@ -10,7 +10,7 @@ import java.util.Map;
 public class Utilities {
   private static Map<String, Integer> counters = new HashMap<>();
 
-  private static DecimalFormat df = new DecimalFormat("#.####");
+  private static DecimalFormat df = new DecimalFormat("#.##");
 
   public static void printVector2(Vector2f vec, String desc) {
     System.out.println(desc + df.format(vec.x) + " " + df.format(vec.y));
@@ -50,5 +50,13 @@ public class Utilities {
             if (counter == delay) counters.put(desc, 0);
             else counters.put(desc, counter + 1);
         }
+    }
+
+    public static String trunctate(float f){
+      return df.format(f);
+    }
+
+    public static String trunctate(double f){
+        return df.format(f);
     }
 }

@@ -1,6 +1,8 @@
-package pl.karatesan.engine.gameObjects;
+package pl.karatesan.engine.gameObjects.entity;
 
 import org.joml.Vector2f;
+import pl.karatesan.engine.context.World;
+import pl.karatesan.engine.gameObjects.Team;
 import pl.karatesan.engine.texture.Texture;
 
 public abstract class Entity {
@@ -19,6 +21,7 @@ public abstract class Entity {
       Vector2f aimDirection,
       int health,
       Vector2f size,
+      Team team,
       Texture texture) {
     this.position = new Vector2f(position);
     this.speed = speed;
@@ -26,6 +29,7 @@ public abstract class Entity {
     this.health = health;
     this.size = size;
     this.isAlive = true;
+    this.team = team;
     this.texture = texture;
   }
 
@@ -33,6 +37,8 @@ public abstract class Entity {
     health -= damage;
     position.add(pushback);
   }
+
+  public abstract void update(World world, double deltaTime);
 
   public Vector2f getPosition() {
     return position;

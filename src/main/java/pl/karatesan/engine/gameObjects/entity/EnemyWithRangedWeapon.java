@@ -1,6 +1,9 @@
-package pl.karatesan.engine.gameObjects;
+package pl.karatesan.engine.gameObjects.entity;
 
 import org.joml.Vector2f;
+import pl.karatesan.engine.context.World;
+import pl.karatesan.engine.gameObjects.Team;
+import pl.karatesan.engine.gameObjects.weapons.Weapon;
 import pl.karatesan.engine.texture.Texture;
 
 public class EnemyWithRangedWeapon extends Enemy {
@@ -13,19 +16,27 @@ public class EnemyWithRangedWeapon extends Enemy {
       Vector2f aimDirection,
       int health,
       Vector2f size,
-      RangedWeapon weapon,
+      Weapon weapon,
       Texture texture) {
     super(position, speed, aimDirection, health, size, weapon, texture);
     this.aimBuffer = new Vector2f();
   }
 
-  public void update(double deltaTime, Vector2f playerPosition) {
+  public void update(World world, double deltaTime) {
     this.weapon.update(deltaTime);
+    Vector2f playerPosition = world.getPlayer().getPosition();
     float range = Vector2f.distance(playerPosition.x, playerPosition.y, position.x, position.y);
     inRange = range < weapon.getRange();
     playerPosition.sub(position, aimBuffer);
     aimBuffer.normalize();
     aimDirection.set(aimBuffer);
+    move(deltaTime);
+    if (inRange) {
+      float random = world.getRandomService().randFloatInRange(0.2f, 0.4f);
+      Vector2f perpendicularDir = new Vector2f(-aimDirection.y, aimDirection.x).mul(random);
+      perpendicularDir.add(aimDirection);
+      weapon.tryShoot(world, position, perpendicularDir, Team.ENEMY);
+    }
   }
 
   public void move(double deltaTime) {
@@ -35,12 +46,7 @@ public class EnemyWithRangedWeapon extends Enemy {
     }
   }
 
-  public boolean tryAttack() {
-    if (inRange) return weapon.shot();
-    return false;
-  }
-
-  public RangedWeapon getWeapon() {
+  public Weapon getWeapon() {
     return weapon;
   }
 }

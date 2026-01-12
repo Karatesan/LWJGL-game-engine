@@ -1,10 +1,13 @@
-package pl.karatesan.engine.gameObjects;
+package pl.karatesan.engine.gameObjects.entity;
 
 import org.joml.Vector2f;
+import pl.karatesan.engine.context.World;
+import pl.karatesan.engine.gameObjects.Team;
+import pl.karatesan.engine.gameObjects.weapons.Weapon;
 import pl.karatesan.engine.texture.Texture;
 
 public abstract class Enemy extends Entity {
-  protected RangedWeapon weapon;
+  protected Weapon weapon;
   protected boolean inRange;
 
   public Enemy(
@@ -13,18 +16,16 @@ public abstract class Enemy extends Entity {
       Vector2f aimDirection,
       int health,
       Vector2f size,
-      RangedWeapon weapon,
+      Weapon weapon,
       Texture texture) {
-    super(position, speed, aimDirection, health, size, texture);
+    super(position, speed, aimDirection, health, size, Team.ENEMY, texture);
     this.weapon = weapon;
     this.team = Team.ENEMY;
   }
 
-  public abstract void update(double deltaTime, Vector2f playerPosition);
+  public abstract void update(World world, double deltaTime);
 
   public abstract void move(double deltaTime);
-
-  public abstract boolean tryAttack();
 
   @Override
   public void takeDamage(int damage, Vector2f pushback) {
@@ -34,11 +35,11 @@ public abstract class Enemy extends Entity {
     }
   }
 
-  public RangedWeapon getWeapon() {
+  public Weapon getWeapon() {
     return weapon;
   }
 
-  public void setWeapon(RangedWeapon weapon) {
+  public void setWeapon(Weapon weapon) {
     this.weapon = weapon;
   }
 

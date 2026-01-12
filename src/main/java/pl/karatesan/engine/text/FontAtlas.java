@@ -97,15 +97,19 @@ public class FontAtlas {
     return scaleH;
   }
 
-    public Texture getFontTexture() {
-        return fontTexture;
-    }
+  public Texture getFontTexture() {
+    return fontTexture;
+  }
 
-    public void setFontTexture(Texture fontTexture) {
-        this.fontTexture = fontTexture;
-    }
+  public void setFontTexture(Texture fontTexture) {
+    this.fontTexture = fontTexture;
+  }
 
-    public int getBase() {
-        return base;
-    }
+  public int getBase() {
+    return base;
+  }
+
+  public int getLineHeight() {
+    return lineHeight;
+  }
 }
