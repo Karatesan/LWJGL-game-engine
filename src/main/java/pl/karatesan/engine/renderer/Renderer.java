@@ -121,15 +121,14 @@ public class Renderer {
       glActiveTexture(GL_TEXTURE0);
       atlas.getFontTexture().bindTexture();
     }
-    if (text.isUpdated()) {
-      fontMesh.updateVBO(
-          text.getPosition(),
-          text.getGlyphs(),
-          atlas.getScaleW(),
-          atlas.getScaleH(),
-          atlas.getBase());
-      text.flushUpdate();
-    }
+    fontMesh.updateVBO(
+        text.getPosition(),
+        text.getGlyphs(),
+        atlas.getScaleW(),
+        atlas.getScaleH(),
+        atlas.getBase());
+    text.flushUpdate();
+
     fontMesh.draw();
   }
 

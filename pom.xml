@@ -77,7 +77,15 @@
             <artifactId>joml</artifactId>
             <version>1.10.5</version>
         </dependency>
+        <dependency>
+            <groupId>org.lwjgl</groupId>
+            <artifactId>lwjgl-openal</artifactId>
+            <version>${lwjgl.version}</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
+    <!-- Source: https://mvnrepository.com/artifact/org.lwjgl/lwjgl-openal -->
+
 
     <build>
         <plugins>

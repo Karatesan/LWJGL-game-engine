@@ -121,7 +121,7 @@ public class Mesh {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
   }
 
-  public int updateVBO(
+  public void updateVBO(
       Vector2f position, List<FontGlyph> glyphs, float scaleW, float scaleH, float baseline) {
     if (glyphs.size() > maxGlyphs)
       throw new RuntimeException(
@@ -186,7 +186,6 @@ public class Mesh {
     }
     verticesToDraw = glyphs.size() * floatsPerVertex * verticesPerGlyph;
     glBufferSubData(GL_ARRAY_BUFFER, 0, vertices);
-    return arrPosition;
   }
 
   public void draw() {

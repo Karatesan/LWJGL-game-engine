@@ -18,7 +18,7 @@ import pl.karatesan.engine.text.UIAnchor;
 import pl.karatesan.engine.texture.TextureManager;
 import pl.karatesan.engine.utils.RandomService;
 import pl.karatesan.engine.utils.Utilities;
-
+//TODO finite state machine for enemies
 public class Game {
   private World world;
   private Camera2D camera;
@@ -35,6 +35,9 @@ public class Game {
   private FontAtlas fontAtlas;
   private Text time;
   private Text killCounter;
+  private Text fpsCounter;
+  private double fps;
+  private int enemiesKilled;
   private HUD hud;
 
   public Game(Camera2D camera, TextureManager textureManager, RandomService randomService) {
@@ -43,7 +46,7 @@ public class Game {
     this.weaponFactory = new WeaponFactory(textureManager, randomService);
     this.collisionManager = new CollisionManager(randomService);
     this.hud = new HUD(camera.getWindow());
-    Player player = entityFactory.createPlayer(new Vector2f(0, 0), 80, 10000, new Vector2f(50, 50));
+    Player player = entityFactory.createPlayer(new Vector2f(0, 0), 500, 10000, new Vector2f(50, 50));
     AssaultRifle weapon = weaponFactory.createAssaultRiffle(Team.PLAYER);
     // Shotgun weapon = weaponFactory.createShotgun(Team.PLAYER);
     player.setWeapon(weapon);
@@ -56,6 +59,7 @@ public class Game {
     fontAtlas.init();
     this.time = new Text("Time: 00:00", UIAnchor.TOP_CENTER, 0, 0, fontAtlas, 0.5f, hud);
     this.killCounter = new Text("Killed: 0", UIAnchor.TOP_LEFT, 0, 0, fontAtlas, 1f, hud);
+    this.fpsCounter = new Text("00", UIAnchor.TOP_RIGHT, 100, 0, fontAtlas, 0.3f, hud);
   }
 
   // todo bedzie trzeba colission manager, interfejs damageable z metoda takeDamage, damageManager
@@ -63,6 +67,7 @@ public class Game {
   public void update(double deltaTime, GenericInputHandler input) {
     timeElapsed += deltaTime;
     enemySpawnTimer += (float) deltaTime;
+    fps = 1f / deltaTime;
 
     // Player
     Player player = world.getPlayer();
@@ -88,7 +93,6 @@ public class Game {
     }
 
     collisionManager.handleProjectileHits(world.getEntities(), world.getProjectiles(), player);
-    int enemiesKilled = world.getKilledEnemiesCount();
     if (player.wasHit()) {
       int damage = player.getLastHitDamage();
       camera.startShake(damage);
@@ -108,6 +112,8 @@ public class Game {
 
     // UI
     time.update("Time: " + Utilities.trunctate(timeElapsed), fontAtlas);
+    enemiesKilled += world.getKilledEnemiesCount();
+    fpsCounter.update(String.valueOf(fps), fontAtlas);
     if (enemiesKilled > 0) killCounter.update("Killed: " + enemiesKilled, fontAtlas);
 
     world.flushChanges();
@@ -137,7 +143,8 @@ public class Game {
     }
     renderer.beginRenderStaticUI();
     renderer.drawText(time, fontAtlas);
-    renderer.drawText(killCounter,fontAtlas);
+    renderer.drawText(killCounter, fontAtlas);
+    renderer.drawText(fpsCounter,fontAtlas);
     renderer.end();
   }
 }
