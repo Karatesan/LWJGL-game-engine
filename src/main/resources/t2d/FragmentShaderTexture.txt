@@ -1,10 +1,18 @@
 #version 330 core
 
 in vec2 TexCoord;
+in vec3 texColor;
 uniform sampler2D textureSampler;
 
 out vec4 FragColor;
 
 void main() {
-  FragColor = texture(textureSampler, TexCoord);  // Sample texture at UV
-  }
+    vec4 sampled = texture(textureSampler, TexCoord);
+
+    // Multiply the texture color (white) by your uniform (e.g., red)
+    // We keep the alpha from the texture
+    FragColor = vec4(texColor, 1.0) * sampled;
+
+    // Optional: Discard fully transparent pixels (optimization)
+    if(FragColor.a < 0.1) discard;
+}

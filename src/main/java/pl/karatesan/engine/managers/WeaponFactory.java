@@ -2,6 +2,7 @@ package pl.karatesan.engine.managers;
 
 import pl.karatesan.engine.gameObjects.Team;
 import pl.karatesan.engine.gameObjects.weapons.AssaultRifle;
+import pl.karatesan.engine.gameObjects.weapons.Rifle;
 import pl.karatesan.engine.gameObjects.weapons.Shotgun;
 import pl.karatesan.engine.texture.TextureManager;
 import pl.karatesan.engine.utils.RandomService;
@@ -18,10 +19,10 @@ public class WeaponFactory {
   public Shotgun createShotgun(Team team) {
     switch (team) {
       case PLAYER -> {
-        return new Shotgun(1f, textureManager.load("/bullet.jpg"), 30, 50, 250, 250);
+        return new Shotgun(1f, textureManager.load("/bullet.jpg"), 30, 50, 1000, 450);
       }
       case ENEMY -> {
-        return new Shotgun(1f, textureManager.load("/bullet.jpg"), 30, 50, 200, 250);
+        return new Shotgun(1.5f, textureManager.load("/bullet.jpg"), 30, 50, 500, 350);
       }
       default -> {
         return null;
@@ -32,12 +33,24 @@ public class WeaponFactory {
   public AssaultRifle createAssaultRiffle(Team team) {
     switch (team) {
       case PLAYER -> {
-        return new AssaultRifle(
-            0.1f, textureManager.load("/bullet.jpg"), 10, 15, 600, 500);
+        return new AssaultRifle(0.1f, textureManager.load("/bullet.jpg"), 10, 15, 1800, 700);
       }
       case ENEMY -> {
-        return new AssaultRifle(
-            1f, textureManager.load("/bullet.jpg"), 10, 15, 200, 300);
+        return new AssaultRifle(1f, textureManager.load("/bullet.jpg"), 10, 15, 500, 400);
+      }
+      default -> {
+        return null;
+      }
+    }
+  }
+
+  public Rifle createRifle(Team team) {
+    switch (team) {
+      case PLAYER -> {
+        return new Rifle(1.5f, textureManager.load("/bullet.jpg"), 50, 100, 1500, 1500);
+      }
+      case ENEMY -> {
+        return new Rifle(3f, textureManager.load("/bullet.jpg"), 50, 100, 600, 600);
       }
       default -> {
         return null;

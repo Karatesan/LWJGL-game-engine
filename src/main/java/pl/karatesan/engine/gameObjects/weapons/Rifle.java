@@ -4,13 +4,12 @@ import org.joml.Vector2f;
 import pl.karatesan.engine.context.World;
 import pl.karatesan.engine.projectiles.Projectile;
 import pl.karatesan.engine.gameObjects.Team;
+import pl.karatesan.engine.projectiles.RifleProjectile;
 import pl.karatesan.engine.texture.Texture;
 
-public class AssaultRifle extends Weapon {
+public class Rifle extends Weapon {
 
-  private final float rifleSpreadCone = .04f;
-
-  public AssaultRifle(
+  public Rifle(
       float cooldown,
       Texture projectileTexture,
       int minDamage,
@@ -24,19 +23,14 @@ public class AssaultRifle extends Weapon {
         maxDamage,
         projectileVelocity,
         range,
-        WeaponType.ASSAULT_RIFLE);
+        WeaponType.RIFLE);
   }
 
   @Override
   public void createProjectiles(World world, Vector2f origin, Vector2f direction, Team team) {
-    Vector2f bulletDirection = new Vector2f();
-    float x = (float) (world.getRandomService().nextGaussian() * rifleSpreadCone);
-    float y = (float) (world.getRandomService().nextGaussian() * rifleSpreadCone);
-    bulletDirection.x = direction.x + x;
-    bulletDirection.y = direction.y + y;
-    bulletDirection.normalize();
-    Projectile projectile =
-        new Projectile(
+    Vector2f bulletDirection = new Vector2f(direction);
+    RifleProjectile projectile =
+        new RifleProjectile(
             calculateDamage(world),
             bulletDirection,
             origin,

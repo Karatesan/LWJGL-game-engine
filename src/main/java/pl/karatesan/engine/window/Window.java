@@ -3,7 +3,11 @@ package pl.karatesan.engine.window;
 import org.joml.Vector2d;
 import org.lwjgl.glfw.GLFWKeyCallbackI;
 import org.lwjgl.glfw.GLFWMouseButtonCallbackI;
+import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
+import org.lwjgl.system.MemoryStack;
+
+import java.nio.IntBuffer;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.GLFW_CONTEXT_VERSION_MINOR;
@@ -25,7 +29,7 @@ public class Window {
   private int frameBufferWidth;
   private int frameBufferHeight;
   private int windowWidth;
-  private int windowHight;
+  private int windowHeight;
   int viewportWidth;
   int viewportHeight;
   int viewportX = 0;
@@ -38,22 +42,44 @@ public class Window {
   private final int PROJECTION_WIDTH;
   private final int PROJECTION_HEIGHT;
 
-  public Window(
-      int windowWidth, int windowHeight, String title, int projectionWidth, int projectionHeight) {
+  public Window( String title, int projectionWidth, int projectionHeight) {
     this.isWindowResized = true; // initial flag state so renderer can set projection matrix
-    this.windowHight = windowHeight;
-    this.windowWidth = windowWidth;
-    this.frameBufferHeight = windowHeight * 2; // TODO hardcoded retina scale
-    this.frameBufferWidth = windowWidth * 2;
     this.originalAspect = (float) projectionWidth / projectionHeight;
     this.mousePosition = new Vector2d();
     this.PROJECTION_HEIGHT = projectionHeight;
     this.PROJECTION_WIDTH = projectionWidth;
+
+    // 1. Get the monitor and its current video mode (resolution/refresh rate)
+    long monitor = glfwGetPrimaryMonitor();
+    GLFWVidMode vidMode = glfwGetVideoMode(monitor);
+
+    // 2. Configure Hints BEFORE creation
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_DECORATED, GLFW_FALSE); // Remove borders/title bar
+    glfwWindowHint(GLFW_RED_BITS, vidMode.redBits());
+    glfwWindowHint(GLFW_GREEN_BITS, vidMode.greenBits());
+    glfwWindowHint(GLFW_BLUE_BITS, vidMode.blueBits());
+    glfwWindowHint(GLFW_REFRESH_RATE, vidMode.refreshRate());
 
-    window = glfwCreateWindow(windowWidth, windowHeight, title, NULL, NULL);
+    // 3. Create Window using the Monitor's resolution
+    // window = glfwCreateWindow(vidMode.width(), vidMode.height(), title, NULL, NULL);
+
+    // 4. (Optional) If you want Exclusive Fullscreen instead:
+    window = glfwCreateWindow(vidMode.width(), vidMode.height(), title, monitor, NULL);
+
+    try (MemoryStack stack = MemoryStack.stackPush()) {
+      IntBuffer pWidth = stack.mallocInt(1);
+      IntBuffer pHeight = stack.mallocInt(1);
+
+      glfwGetFramebufferSize(window, pWidth, pHeight);
+      this.frameBufferWidth = pWidth.get(0);
+      this.frameBufferHeight = pHeight.get(0);
+      glfwGetWindowSize(window,pWidth,pHeight);
+      this.windowWidth = pWidth.get(0);
+      this.windowHeight = pHeight.get(0);
+    }
     if (window == NULL) {
       throw new RuntimeException("Failed to create window: " + title);
     }
@@ -71,8 +97,8 @@ public class Window {
   }
 
   // framebuffer is physicall pixels of display
-  // current implementation keeps static projection view and height
-  // meraning that each window resize we have to recalculate viewport to keep correct aspect ratio
+  // current implementation keeps static projection width and height
+  // meaning that each window resize we have to recalculate viewport to keep correct aspect ratio
   private void framebufferSizeCallback(long window, int width, int height) {
     this.frameBufferWidth = width;
     this.frameBufferHeight = height;
@@ -101,7 +127,7 @@ public class Window {
 
   private void windowSizeCallback(long window, int width, int height) {
     this.windowWidth = width;
-    this.windowHight = height;
+    this.windowHeight = height;
   }
 
   public void swapBuffers() {
@@ -121,7 +147,7 @@ public class Window {
   }
 
   public int getWindowHeight() {
-    return windowHight;
+    return windowHeight;
   }
 
   public int getWindowWidth() {
@@ -170,5 +196,13 @@ public class Window {
 
   public int getViewportY() {
     return viewportY;
+  }
+
+  public int getFrameBufferWidth() {
+    return frameBufferWidth;
+  }
+
+  public int getFrameBufferHeight() {
+    return frameBufferHeight;
   }
 }

@@ -1,42 +1,37 @@
 package pl.karatesan.engine.managers;
 
 import org.joml.Vector2f;
-import pl.karatesan.engine.gameObjects.*;
-import pl.karatesan.engine.gameObjects.entity.Enemy;
+import pl.karatesan.engine.context.World;
 import pl.karatesan.engine.gameObjects.entity.Entity;
 import pl.karatesan.engine.gameObjects.entity.Player;
+import pl.karatesan.engine.gameObjects.weapons.ArmorType;
+import pl.karatesan.engine.gameObjects.weapons.WeaponUtil;
+import pl.karatesan.engine.projectiles.Projectile;
 import pl.karatesan.engine.utils.RandomService;
-
-import java.util.List;
 
 public class CollisionManager {
 
-  private RandomService randomService;
-  private Vector2f pushbackBuffer;
-
-  public CollisionManager(RandomService randomService) {
-    this.randomService = randomService;
-    this.pushbackBuffer = new Vector2f();
-  }
-
-  public void handleProjectileHits(
-          List<Entity> entities, List<Projectile> projectiles, Player player) {
-    for (Projectile p : projectiles) {
-      if (p.isDestroyed()) continue;
-      if (p.getTeam() != player.getTeam() && entityHitCollision(p, player)) {
-        player.takeDamage(p.getDamage(), null);
-        p.destroyProjectile();
-      } else {
-        for (Entity e : entities) {
-          if (p.getTeam() == e.getTeam()) continue;
-          if (e.isAlive()) {
-            if (entityHitCollision(p, e)) {
-              int weaponPower = p.getDamage() / 4;
-              float x = randomService.randFloatInRange(-1.0f, 1.0f);
-              float y = randomService.randFloatInRange(-1.0f, 1.0f);
-              pushbackBuffer.set(p.getDirection().x + x, p.getDirection().y + y).mul(weaponPower);
-              e.takeDamage(p.getDamage(), pushbackBuffer);
-              p.destroyProjectile();
+  public void handleProjectileHits(World world, WeaponUtil weaponUtil) {
+    Player player = world.getPlayer();
+    for (Projectile projectile : world.getProjectiles()) {
+      if (!projectile.isDestroyed()) {
+        if (projectile.getTeam() != player.getTeam() && entityHitCollision(projectile, player)) {
+          if (projectile.onCollision(player)) player.takeDamage(projectile.getDamage(), null);
+        } else {
+          for (Entity enemy : world.getEntities()) {
+            if (projectile.getTeam() != enemy.getTeam()) {
+              if (enemy.isAlive() && entityHitCollision(projectile, enemy)) {
+                if (projectile.onCollision(enemy)) {
+                  enemy.takeDamage(
+                      projectile.getDamage(),
+                      weaponUtil.calculatePushBack(
+                          projectile.getDamage(), projectile.getDirection()));
+                  world
+                      .getSoundManager()
+//                      .playGruntAfterHitSound(enemy.getPosition())
+                      .playBulletHitSound(ArmorType.FLESH, enemy.getPosition());
+                }
+              }
             }
           }
         }

@@ -31,12 +31,13 @@ public class Player extends Entity {
     wasHit = true;
     this.lastHitDamage = damage;
     if (health <= 0) {
+      health = 0;
       isAlive = false;
     }
   }
 
-  public void tryShoot(World world) {
-     weapon.tryShoot(world,position,aimDirection,Team.PLAYER);
+  public boolean tryShoot(World world) {
+    return weapon.tryShoot(world, position, aimDirection, Team.PLAYER);
   }
 
   public void update(World world, double deltaTime) {

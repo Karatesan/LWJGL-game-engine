@@ -18,7 +18,6 @@ public class SpawnManager {
   private final TextureManager textureManager;
   private final WeaponFactory weaponFactory;
   private RandomService randomService;
-  private Vector2f positionBuffer;
   private Vector2f aimDirectionBuffer;
   private EnemyType[] enemyType;
 
@@ -27,7 +26,6 @@ public class SpawnManager {
     this.textureManager = textureManager;
     this.weaponFactory = weaponFactory;
     this.randomService = randomService;
-    this.positionBuffer = new Vector2f();
     this.aimDirectionBuffer = new Vector2f();
     this.enemyType = EnemyType.values();
   }
@@ -38,36 +36,30 @@ public class SpawnManager {
     aimDirectionBuffer.normalize();
     Enemy enemy = null;
     switch (enemyType) {
-      case ENEMY_WITH_RIFFLE -> {
-        enemy =
-            createEnemyWithRangedWeapon(
-                position, aimDirectionBuffer, weaponFactory.createAssaultRiffle(Team.ENEMY));
-      }
-      case ENEMY_WITH_SHOTGUN -> {
-        enemy =
-            createEnemyWithRangedWeapon(
-                position, aimDirectionBuffer, weaponFactory.createShotgun(Team.ENEMY));
-      }
+      case ENEMY_WITH_ASSAULT_RIFLE ->
+          enemy =
+              createEnemyWithRangedWeapon(
+                  position, aimDirectionBuffer, weaponFactory.createAssaultRiffle(Team.ENEMY));
+      case ENEMY_WITH_SHOTGUN ->
+          enemy =
+              createEnemyWithRangedWeapon(
+                  position, aimDirectionBuffer, weaponFactory.createShotgun(Team.ENEMY));
+      case ENEMY_WITH_RIFLE ->
+          enemy =
+              createEnemyWithRangedWeapon(
+                  position, aimDirectionBuffer, weaponFactory.createRifle(Team.ENEMY));
     }
     world.addEntity(enemy);
-  }
-
-  public void spawnWave(int enemyNumber, float radius, Vector2f playerPosition, World world) {
-    if (enemyNumber <= 0)
-      throw new IllegalArgumentException("Number of spawned enemies must be greater than 0");
-    for (int i = 0; i < enemyNumber; i++) {
-      double maxAngle = Math.PI * 2;
-      double angle = randomService.randomDoubleInRange(0, maxAngle);
-      positionBuffer.x = (float) (playerPosition.x + Math.cos(angle) * radius);
-      positionBuffer.y = (float) (playerPosition.y + Math.sin(angle) * radius);
-      int randIndex = randomService.randIntInRange(0, enemyType.length - 1);
-      this.spawnEnemy(enemyType[randIndex], positionBuffer, playerPosition, world);
-    }
   }
 
   private EnemyWithRangedWeapon createEnemyWithRangedWeapon(
       Vector2f position, Vector2f aim, Weapon weapon) {
     Texture texture = textureManager.load("/sprite.png");
     return new EnemyWithRangedWeapon(position, 25, aim, 100, new Vector2f(50, 50), weapon, texture);
+  }
+
+  public void spawnRandomEnemy(Vector2f position, Vector2f direction, World world) {
+    int randIndex = randomService.randIntInRange(0, enemyType.length - 1);
+    this.spawnEnemy(enemyType[randIndex], position, direction, world);
   }
 }

@@ -1,6 +1,8 @@
-package pl.karatesan.engine.gameObjects;
+package pl.karatesan.engine.projectiles;
 
 import org.joml.Vector2f;
+import pl.karatesan.engine.gameObjects.Team;
+import pl.karatesan.engine.gameObjects.entity.Entity;
 import pl.karatesan.engine.texture.Texture;
 
 import java.text.DecimalFormat;
@@ -46,6 +48,7 @@ public class Projectile {
     direction.mul(distance, directionBuffer);
     distanceTraveled += distance;
     position.add(directionBuffer);
+    if (shouldDestroy()) destroyProjectile();
   }
 
   public boolean shouldDestroy() {
@@ -58,6 +61,13 @@ public class Projectile {
 
   public void destroyProjectile() {
     destroyed = true;
+  }
+
+  //it returns true if we register hit and destroy bullet
+  // for projectiles that hit and pass through target we return false if projectile alrady hit that target
+  public boolean onCollision(Entity entity) {
+    destroyProjectile();
+    return true;
   }
 
   public Vector2f getDirection() {

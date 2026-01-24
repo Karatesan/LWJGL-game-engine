@@ -4,7 +4,6 @@ import org.joml.Vector2f;
 import pl.karatesan.engine.context.World;
 import pl.karatesan.engine.gameObjects.Team;
 import pl.karatesan.engine.texture.Texture;
-import pl.karatesan.engine.utils.RandomService;
 
 public abstract class Weapon {
   protected float cooldown;
@@ -15,6 +14,7 @@ public abstract class Weapon {
   private float range;
   private float currentCooldown;
   private boolean isOnCooldown;
+  private WeaponType weaponType;
 
   public Weapon(
       float cooldown,
@@ -22,23 +22,28 @@ public abstract class Weapon {
       int minDamage,
       int maxDamage,
       float projectileVelocity,
-      float range) {
+      float range,
+      WeaponType weaponType) {
     this.cooldown = cooldown;
     this.projectileTexture = projectileTexture;
     this.maxDamage = maxDamage;
     this.minDamage = minDamage;
     this.projectileVelocity = projectileVelocity;
     this.range = range;
+    this.weaponType = weaponType;
     this.currentCooldown = 0;
     this.isOnCooldown = false;
   }
 
-  public void tryShoot(World world, Vector2f origin, Vector2f direction, Team team) {
+  public boolean tryShoot(World world, Vector2f origin, Vector2f direction, Team team) {
     if (!isOnCooldown) {
       createProjectiles(world, origin, direction, team);
+      world.getSoundManager().playShotSound(weaponType, origin);
       currentCooldown = 0;
       isOnCooldown = true;
+      return true;
     }
+    return false;
   }
 
   public void update(double deltaTime) {

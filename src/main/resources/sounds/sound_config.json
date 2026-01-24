@@ -1,0 +1,75 @@
+{
+  "shotgunShot": {
+    "paths": [
+      "/sounds/shot/shotgunShot1.ogg"
+    ],
+    "volume": 0.6,
+    "variation": "LOW"
+  },
+  "rifleShot": {
+    "paths": [
+      "/sounds/shot/rifleShot1.ogg"
+    ],
+    "volume": 0.6,
+    "variation": "LOW"
+  },
+  "assaultRifleShot": {
+    "paths": [
+      "/sounds/shot/assaultRifleShot1.ogg"
+    ],
+    "volume": 0.6,
+    "variation": "MEDIUM"
+  },
+  "footstep": {
+    "paths": [
+      "/sounds/footsteps.ogg"
+    ],
+    "volume": 0.5,
+    "variation": "HIGH"
+  },
+  "theme": {
+    "paths": [
+      "/sounds/theme2.ogg"
+    ],
+    "volume": 0.3,
+    "variation": "NONE",
+    "looping": true
+  },
+  "hitGrunt": {
+    "paths": [
+      "/sounds/hit/hitGrunt1.ogg",
+      "/sounds/hit/hitGrunt2.ogg",
+      "/sounds/hit/hitGrunt3.ogg",
+      "/sounds/hit/hitGrunt4.ogg",
+      "/sounds/hit/hitGrunt5.ogg"
+    ],
+    "volume": 0.8,
+    "variation": "LOW"
+  },
+  "bulletHitFlesh": {
+    "paths": [
+      "/sounds/Hit/bulletHitFlesh1.ogg",
+      "/sounds/Hit/bulletHitFlesh2.ogg",
+      "/sounds/Hit/bulletHitFlesh3.ogg"
+    ],
+    "volume": 0.4,
+    "variation": "MEDIUM"
+  },
+  "die": {
+    "paths": [
+      "/sounds/hit/die1.ogg"
+    ],
+    "volume": 0.4,
+    "variation": "MEDIUM"
+  },
+  "caseFall": {
+    "paths": [
+      "/sounds/shot/caseFall/caseFall1.ogg",
+      "/sounds/shot/caseFall/caseFall2.ogg",
+      "/sounds/shot/caseFall/caseFall3.ogg",
+      "/sounds/shot/caseFall/caseFall4.ogg"
+    ],
+    "volume": 0.8,
+    "variation": "MEDIUM"
+  }
+}

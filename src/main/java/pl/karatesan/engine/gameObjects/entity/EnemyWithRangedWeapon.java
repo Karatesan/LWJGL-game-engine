@@ -32,10 +32,10 @@ public class EnemyWithRangedWeapon extends Enemy {
     aimDirection.set(aimBuffer);
     move(deltaTime);
     if (inRange) {
-      float random = world.getRandomService().randFloatInRange(0.2f, 0.4f);
+      float random = world.getRandomService().randFloatInRange(0.1f, 0.2f);
       Vector2f perpendicularDir = new Vector2f(-aimDirection.y, aimDirection.x).mul(random);
       perpendicularDir.add(aimDirection);
-      weapon.tryShoot(world, position, perpendicularDir, Team.ENEMY);
+      weapon.tryShoot(world, position, aimDirection, Team.ENEMY);
     }
   }
 

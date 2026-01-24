@@ -44,7 +44,7 @@ public class Camera2D {
 
   public Matrix4f getViewMatrix() {
     if (positionChanged) {
-      view.identity().translate(-position.x, -position.y, 0).scale(zoom);
+      view.identity().scale(zoom).translate(-position.x, -position.y, 0);
       positionChanged = false;
     }
     return view;
@@ -77,20 +77,51 @@ public class Camera2D {
     return projection;
   }
 
-  public Vector2f convertScreenToWorld(Vector2d mouseCoords) {
-    int width = window.getWindowWidth();
-    int height = window.getWindowHeight();
-    double xNDC = 2 * mouseCoords.x / (double) width - 1;
-    double yNDC = -2 * mouseCoords.y / (double) height + 1;
-    clipCoords.set(xNDC, yNDC, 0, 1);
-    projection.mul(view, projectionViewMatrix);
-    projectionViewMatrix.invert();
-    clipCoords.mul(projectionViewMatrix);
-    mouseWorldPosition.set((float) clipCoords.x, (float) clipCoords.y);
-    Utilities.printVector2WithDelay(160, mouseWorldPosition, "Mouse World Position: ");
-    Utilities.printVector2WithDelay(160, mouseCoords, "Mouse  Position: ");
-    return new Vector2f(mouseWorldPosition);
-  }
+    public Vector2f convertScreenToWorld(Vector2d mouseCoords) {
+        // 1. Get Viewport metrics from Window
+        // You need to expose these getters in Window class
+        int vpX = window.getViewportX();
+        int vpY = window.getViewportY();
+        int vpW = window.getViewportWidth();
+        int vpH = window.getViewportHeight();
+
+        // 2. Adjust Mouse Coords to be relative to the Viewport
+        // Note: Mouse Y is usually Top-Down, OpenGL Y is Bottom-Up.
+        // However, for NDC calculation, we handle the flip manually.
+
+        // Convert Logical Mouse (Window) to Physical Mouse (Framebuffer)
+        // GLFW reports mouse in "Screen Coordinates". Framebuffer might be 2x (Retina).
+        // If your viewport is calculated based on Framebuffer size, you need to scale mouse input.
+        // BUT: usually glViewport uses physical pixels.
+
+        // Let's assume mouseCoords match the scale of viewportX/Y logic.
+        // If you are on Retina, windowWidth != framebufferWidth.
+        // You might need: mouseX *= (frameBufferWidth / windowWidth);
+
+        double mouseX = mouseCoords.x;
+        double mouseY = mouseCoords.y;
+
+        // Handle Retina/HighDPI scaling if needed
+        float contentScaleX = (float)window.getFrameBufferWidth() / window.getWindowWidth();
+        float contentScaleY = (float)window.getFrameBufferHeight() / window.getWindowHeight();
+        mouseX *= contentScaleX;
+        mouseY *= contentScaleY;
+
+        // 3. Calculate NDC based on VIEWPORT, not Window
+        double xNDC = 2 * (mouseX - vpX) / (double) vpW - 1;
+        double yNDC = -2 * (mouseY - vpY) / (double) vpH + 1; // Flip Y here
+
+        clipCoords.set(xNDC, yNDC, 0, 1);
+
+        // ... matrix multiplication ...
+        Matrix4f currentView = getViewMatrix();
+        projection.mul(currentView, projectionViewMatrix);
+        projectionViewMatrix.invert();
+        clipCoords.mul(projectionViewMatrix);
+
+        mouseWorldPosition.set((float) clipCoords.x, (float) clipCoords.y);
+        return new Vector2f(mouseWorldPosition);
+    }
 
   public void zoom(float zoomOffset) {
     zoom += zoomOffset;

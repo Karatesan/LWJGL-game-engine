@@ -1,7 +1,5 @@
 package pl.karatesan.engine.utils;
 
-import pl.karatesan.dump.Vector2f;
-
 public class Vector2fUtils {
 
 //  public static Vector2f randomAroundCircle(Vector2f center, float radius) {

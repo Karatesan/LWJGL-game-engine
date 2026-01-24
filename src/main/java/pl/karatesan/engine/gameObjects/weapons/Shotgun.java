@@ -2,10 +2,9 @@ package pl.karatesan.engine.gameObjects.weapons;
 
 import org.joml.Vector2f;
 import pl.karatesan.engine.context.World;
-import pl.karatesan.engine.gameObjects.Projectile;
+import pl.karatesan.engine.projectiles.Projectile;
 import pl.karatesan.engine.gameObjects.Team;
 import pl.karatesan.engine.texture.Texture;
-import pl.karatesan.engine.utils.RandomService;
 
 public class Shotgun extends Weapon {
 
@@ -28,7 +27,8 @@ public class Shotgun extends Weapon {
         minDamage,
         maxDamage,
         projectileVelocity,
-        range);
+        range,
+        WeaponType.SHOTGUN);
   }
 
   public void createProjectiles(World world, Vector2f origin, Vector2f direction, Team team) {

@@ -1,5 +1,6 @@
 package pl.karatesan.dump;
 
+import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL15;

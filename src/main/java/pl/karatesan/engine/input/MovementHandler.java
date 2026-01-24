@@ -1,6 +1,6 @@
 package pl.karatesan.engine.input;
 
-import pl.karatesan.dump.Vector2f;
+import org.joml.Vector2f;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
@@ -23,7 +23,7 @@ public class MovementHandler {
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) dx += 1;
 
         if (dx != 0 || dy != 0) {
-            movementDir.set(dx, dy).normalizeSelf(); // no new object created
+            movementDir.set(dx, dy).normalize(); // no new object created
             position.add(
                     (float) (movementDir.x * speed * deltaTime),
                     (float) (movementDir.y * speed * deltaTime)

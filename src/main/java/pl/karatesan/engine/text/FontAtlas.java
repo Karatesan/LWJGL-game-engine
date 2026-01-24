@@ -20,14 +20,14 @@ public class FontAtlas {
 
   public FontAtlas() {
     this.atlas = new HashMap<>();
-    fontTexture = new Texture("/fonts/Font.png", GL_CLAMP_TO_EDGE);
+    fontTexture = new Texture("/fonts/atlas.png", GL_CLAMP_TO_EDGE);
   }
 
   public void init() {
     try (BufferedReader bf =
         new BufferedReader(
             new InputStreamReader(
-                Objects.requireNonNull(this.getClass().getResourceAsStream("/fonts/Font.txt"))))) {
+                Objects.requireNonNull(this.getClass().getResourceAsStream("/fonts/atlas.txt"))))) {
       String s = "";
       while (s != null) {
         s = bf.readLine();
@@ -85,7 +85,7 @@ public class FontAtlas {
 
   public void test() {
     for (Character ch : atlas.keySet()) {
-      System.out.println(ch + " " + atlas.get(ch));
+
     }
   }
 

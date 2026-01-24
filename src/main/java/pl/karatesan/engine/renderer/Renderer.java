@@ -29,6 +29,7 @@ public class Renderer {
   private Camera2D camera;
   private Matrix4f viewForUI;
   private Matrix4f projectionForUI;
+  private final Vector3f ORIGINAL_COLOR = new Vector3f(1.0f, 1.0f, 1.0f);
 
   public Renderer(Window window, Camera2D camera) {
     this.window = window;
@@ -84,13 +85,15 @@ public class Renderer {
     shader.use();
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    shader.setUniformM4("view", camera.getViewMatrix());
-    shader.setUniformM4("projection", camera.getUpdatedProjectionMatrix(window));
-
     // not needed since we use fixed projection resolution, does not change when resizing window
     //    if (window.consumeResizeFlag()) {
     //      shader.setUniformM4("projection", camera.getUpdatedProjectionMatrix(window));
     //    }
+  }
+
+  public void drawQuad(Vector2f position, Vector2f aimDirection, Vector2f size, Texture texture) {
+    // 1.0, 1.0, 1.0 = White (No Tint)
+    drawQuad(position, aimDirection, size, ORIGINAL_COLOR, texture);
   }
 
   public void drawQuad(
@@ -98,7 +101,7 @@ public class Renderer {
     float angle = (float) Math.atan2(aimDirection.y, aimDirection.x);
     model.identity().translate(position.x, position.y, 0).rotateZ(angle).scale(size.x, size.y, 1);
     shader.setUniformM4("model", model);
-    if (color != null) shader.setUniform3f("color", color.x, color.y, color.z);
+    shader.setUniform3f("color", color.x, color.y, color.z);
     if (texture != null) {
       glActiveTexture(GL_TEXTURE0);
       texture.bindTexture();
@@ -111,12 +114,28 @@ public class Renderer {
     shader.setUniformM4("projection", projectionForUI);
   }
 
+  public void beginRenderDynamicUI() {
+    shader.setUniformM4("view", camera.getViewMatrix());
+    shader.setUniformM4("projection", projectionForUI);
+  }
+
+  public void beginRenderDynamicObjects() {
+    shader.setUniformM4("view", camera.getViewMatrix());
+    shader.setUniformM4("projection", camera.getUpdatedProjectionMatrix(window));
+  }
+
   public void drawText(Text text, FontAtlas atlas) {
+    // 1.0, 1.0, 1.0 = White (No Tint)
+    drawText(text, atlas, new Vector3f(1.0f, 1.0f, 1.0f));
+  }
+
+  public void drawText(Text text, FontAtlas atlas, Vector3f color) {
     model
         .identity()
         .translate(text.getPosition().x, text.getPosition().y, 0)
         .scale(text.getScale(), text.getScale(), 1);
     shader.setUniformM4("model", model);
+    shader.setUniform3f("color", color.x, color.y, color.z);
     if (atlas.getFontTexture() != null) {
       glActiveTexture(GL_TEXTURE0);
       atlas.getFontTexture().bindTexture();

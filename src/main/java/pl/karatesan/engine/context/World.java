@@ -3,6 +3,9 @@ package pl.karatesan.engine.context;
 import pl.karatesan.engine.gameObjects.*;
 import pl.karatesan.engine.gameObjects.entity.Entity;
 import pl.karatesan.engine.gameObjects.entity.Player;
+import pl.karatesan.engine.projectiles.Projectile;
+import pl.karatesan.engine.sound.AudioEngine;
+import pl.karatesan.engine.sound.SoundManager;
 import pl.karatesan.engine.utils.RandomService;
 
 import java.util.ArrayList;
@@ -18,8 +21,10 @@ public class World {
   List<Projectile> projectilesToAdd;
 
   private RandomService randomService;
+  private SoundManager soundManager;
 
-  public World(Player player, Ground ground, RandomService randomService) {
+  public World(
+      Player player, Ground ground, RandomService randomService, SoundManager soundManager) {
     this.entities = new ArrayList<>();
     this.projectiles = new ArrayList<>();
     this.player = player;
@@ -27,6 +32,7 @@ public class World {
     this.entitiesToAdd = new ArrayList<>();
     this.projectilesToAdd = new ArrayList<>();
     this.randomService = randomService;
+    this.soundManager = soundManager;
   }
 
   public void flushChanges() {
@@ -82,5 +88,9 @@ public class World {
   public int getKilledEnemiesCount() {
     return (int)
         entities.stream().filter(e -> !e.isAlive() && e.getTeam().equals(Team.ENEMY)).count();
+  }
+
+  public SoundManager getSoundManager() {
+    return soundManager;
   }
 }
