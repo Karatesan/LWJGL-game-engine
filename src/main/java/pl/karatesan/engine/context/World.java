@@ -2,6 +2,7 @@ package pl.karatesan.engine.context;
 
 import pl.karatesan.engine.gameObjects.*;
 import pl.karatesan.engine.gameObjects.entity.Entity;
+import pl.karatesan.engine.gameObjects.entity.Object;
 import pl.karatesan.engine.gameObjects.entity.Player;
 import pl.karatesan.engine.projectiles.Projectile;
 import pl.karatesan.engine.sound.AudioEngine;
@@ -16,6 +17,7 @@ public class World {
   Player player;
   Ground ground;
   List<Projectile> projectiles;
+  List<Object> powerUps;
 
   List<Entity> entitiesToAdd;
   List<Projectile> projectilesToAdd;
@@ -31,6 +33,7 @@ public class World {
     this.ground = ground;
     this.entitiesToAdd = new ArrayList<>();
     this.projectilesToAdd = new ArrayList<>();
+    this.powerUps = new ArrayList<>();
     this.randomService = randomService;
     this.soundManager = soundManager;
   }
@@ -47,6 +50,7 @@ public class World {
     }
     projectiles.removeIf(Projectile::isDestroyed);
     entities.removeIf(e -> !e.isAlive());
+    powerUps.removeIf(p -> !p.isActive());
   }
 
   public List<Entity> getEntities() {
@@ -79,6 +83,14 @@ public class World {
 
   public void addProjectile(Projectile p) {
     projectiles.add(p);
+  }
+
+  public List<Object> getPowerUps() {
+    return powerUps;
+  }
+
+  public void addPowerUp(Object powerUp) {
+    powerUps.add(powerUp);
   }
 
   public RandomService getRandomService() {

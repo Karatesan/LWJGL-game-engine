@@ -68,6 +68,10 @@ public abstract class Entity {
     return health;
   }
 
+  public void heal(int heal) {
+    health += heal;
+  }
+
   public Vector2f getSize() {
     return size;
   }

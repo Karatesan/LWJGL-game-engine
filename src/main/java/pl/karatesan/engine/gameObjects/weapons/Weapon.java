@@ -127,4 +127,8 @@ public abstract class Weapon {
   public void setOnCooldown(boolean onCooldown) {
     isOnCooldown = onCooldown;
   }
+
+  class WeaponStats{
+      float minDamage,maxDamage,range,cooldown;
+  }
 }

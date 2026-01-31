@@ -30,6 +30,7 @@ public class Renderer {
   private Matrix4f viewForUI;
   private Matrix4f projectionForUI;
   private final Vector3f ORIGINAL_COLOR = new Vector3f(1.0f, 1.0f, 1.0f);
+  private final Vector2f NO_AIM = new Vector2f(0, 0);
 
   public Renderer(Window window, Camera2D camera) {
     this.window = window;
@@ -89,6 +90,10 @@ public class Renderer {
     //    if (window.consumeResizeFlag()) {
     //      shader.setUniformM4("projection", camera.getUpdatedProjectionMatrix(window));
     //    }
+  }
+//for powerups
+  public void drawQuad(Vector2f position, Vector2f size, Texture texture) {
+    drawQuad(position, NO_AIM, size, ORIGINAL_COLOR, texture);
   }
 
   public void drawQuad(Vector2f position, Vector2f aimDirection, Vector2f size, Texture texture) {

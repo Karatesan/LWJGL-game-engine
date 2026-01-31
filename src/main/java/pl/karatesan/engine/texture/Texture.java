@@ -37,7 +37,7 @@ public class Texture {
       IntBuffer height = stack.mallocInt(1);
       IntBuffer channels = stack.mallocInt(1);
 
-      //STBImage.stbi_set_flip_vertically_on_load(true);
+      STBImage.stbi_set_flip_vertically_on_load(true);
 
       URL resource = getClass().getResource(path);
       if (resource == null) {

@@ -42,7 +42,7 @@ public class Window {
   private final int PROJECTION_WIDTH;
   private final int PROJECTION_HEIGHT;
 
-  public Window( String title, int projectionWidth, int projectionHeight) {
+  public Window(String title, int projectionWidth, int projectionHeight) {
     this.isWindowResized = true; // initial flag state so renderer can set projection matrix
     this.originalAspect = (float) projectionWidth / projectionHeight;
     this.mousePosition = new Vector2d();
@@ -76,7 +76,7 @@ public class Window {
       glfwGetFramebufferSize(window, pWidth, pHeight);
       this.frameBufferWidth = pWidth.get(0);
       this.frameBufferHeight = pHeight.get(0);
-      glfwGetWindowSize(window,pWidth,pHeight);
+      glfwGetWindowSize(window, pWidth, pHeight);
       this.windowWidth = pWidth.get(0);
       this.windowHeight = pHeight.get(0);
     }
@@ -89,11 +89,15 @@ public class Window {
 
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // vsync (jak działa)
+
     glfwShowWindow(window);
+    glfwFocusWindow(window);
     GL.createCapabilities();
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     calculateViewport(frameBufferWidth, frameBufferHeight);
+    glfwPollEvents(); // Flush startup events
+    glfwFocusWindow(window);
   }
 
   // framebuffer is physicall pixels of display

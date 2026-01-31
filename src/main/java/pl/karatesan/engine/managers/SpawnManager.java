@@ -3,9 +3,8 @@ package pl.karatesan.engine.managers;
 import org.joml.Vector2f;
 import pl.karatesan.engine.context.World;
 import pl.karatesan.engine.gameObjects.*;
-import pl.karatesan.engine.gameObjects.entity.Enemy;
-import pl.karatesan.engine.gameObjects.entity.EnemyWithRangedWeapon;
-import pl.karatesan.engine.gameObjects.entity.Entity;
+import pl.karatesan.engine.gameObjects.entity.*;
+import pl.karatesan.engine.gameObjects.entity.Object;
 import pl.karatesan.engine.gameObjects.weapons.Weapon;
 import pl.karatesan.engine.texture.Texture;
 import pl.karatesan.engine.texture.TextureManager;
@@ -52,9 +51,22 @@ public class SpawnManager {
     world.addEntity(enemy);
   }
 
+  public void spawnPowerUp(PowerUpType type, Vector2f position, World world) {
+    Object powerUp = null;
+
+    switch (type) {
+      case HEALTH_PACK -> {
+        Texture texture = textureManager.load("/apple.png");
+        int healValue = randomService.randIntInRange(10, 30);
+        powerUp = new HealthPack(position, new Vector2f(50, 50), healValue, texture);
+      }
+    }
+    if (powerUp != null) world.addPowerUp(powerUp);
+  }
+
   private EnemyWithRangedWeapon createEnemyWithRangedWeapon(
       Vector2f position, Vector2f aim, Weapon weapon) {
-    Texture texture = textureManager.load("/sprite.png");
+    Texture texture = textureManager.load("/sprite3.png");
     return new EnemyWithRangedWeapon(position, 25, aim, 100, new Vector2f(50, 50), weapon, texture);
   }
 

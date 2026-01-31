@@ -3,6 +3,7 @@ package pl.karatesan.engine.managers;
 import org.joml.Vector2f;
 import pl.karatesan.engine.context.World;
 import pl.karatesan.engine.gameObjects.entity.Entity;
+import pl.karatesan.engine.gameObjects.entity.Object;
 import pl.karatesan.engine.gameObjects.entity.Player;
 import pl.karatesan.engine.gameObjects.weapons.ArmorType;
 import pl.karatesan.engine.gameObjects.weapons.WeaponUtil;
@@ -28,7 +29,7 @@ public class CollisionManager {
                           projectile.getDamage(), projectile.getDirection()));
                   world
                       .getSoundManager()
-//                      .playGruntAfterHitSound(enemy.getPosition())
+                      //                      .playGruntAfterHitSound(enemy.getPosition())
                       .playBulletHitSound(ArmorType.FLESH, enemy.getPosition());
                 }
               }
@@ -50,5 +51,16 @@ public class CollisionManager {
     float radius1 = p.getSize().x / 2;
     float radius2 = e.getSize().x / 2;
     return circleCollision(radius1, p.getPosition(), radius2, e.getPosition());
+  }
+
+  public void handlePowerUpsPick(World world) {
+    Player player = world.getPlayer();
+    float playerRadius = player.getSize().x / 2;
+    for (Object o : world.getPowerUps()) {
+      float objectRadius = o.getSize().x / 2;
+      if (circleCollision(playerRadius, player.getPosition(), objectRadius, o.getPosition())) {
+        o.activate(player, world);
+      }
+    }
   }
 }

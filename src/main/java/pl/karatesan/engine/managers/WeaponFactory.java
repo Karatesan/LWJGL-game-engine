@@ -22,7 +22,7 @@ public class WeaponFactory {
         return new Shotgun(1f, textureManager.load("/bullet.jpg"), 30, 50, 1000, 450);
       }
       case ENEMY -> {
-        return new Shotgun(1.5f, textureManager.load("/bullet.jpg"), 30, 50, 500, 350);
+        return new Shotgun(1.5f, textureManager.load("/bullet.jpg"), 10, 30, 500, 350);
       }
       default -> {
         return null;
@@ -50,7 +50,7 @@ public class WeaponFactory {
         return new Rifle(1.5f, textureManager.load("/bullet.jpg"), 50, 100, 1500, 1500);
       }
       case ENEMY -> {
-        return new Rifle(3f, textureManager.load("/bullet.jpg"), 50, 100, 600, 600);
+        return new Rifle(3f, textureManager.load("/bullet.jpg"), 20, 40, 400, 600);
       }
       default -> {
         return null;

@@ -141,10 +141,9 @@ public class Mesh {
       float top = penY;
       float bottom = top + glyph.getHeight();
       float uLeft = glyph.getX() / scaleW; // left
-      float vTop = (glyph.getY() + glyph.getHeight()) / scaleH;
+      float vTop = 1.0f - ((glyph.getY() + glyph.getHeight()) / scaleH);
       float uRight = (glyph.getX() + glyph.getWidth()) / scaleW; // right
-      float vBot = glyph.getY() / scaleH; // top
-
+      float vBot = 1.0f - (glyph.getY() / scaleH);
       vertices[arrPosition + 0] = left;
       vertices[arrPosition + 1] = top;
       vertices[arrPosition + 2] = 0;

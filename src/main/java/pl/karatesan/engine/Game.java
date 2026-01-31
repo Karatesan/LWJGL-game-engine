@@ -5,6 +5,7 @@ import pl.karatesan.engine.camera.Camera2D;
 import pl.karatesan.engine.context.World;
 import pl.karatesan.engine.gameObjects.*;
 import pl.karatesan.engine.gameObjects.entity.Entity;
+import pl.karatesan.engine.gameObjects.entity.Object;
 import pl.karatesan.engine.gameObjects.entity.Player;
 import pl.karatesan.engine.gameObjects.weapons.AssaultRifle;
 import pl.karatesan.engine.gameObjects.weapons.Shotgun;
@@ -24,6 +25,7 @@ public class Game {
   private World world;
   private Camera2D camera;
   private EnemyWavesManager waveManager;
+  private PowerUpManager powerUpManager;
   private EntityFactory entityFactory;
   private WeaponFactory weaponFactory;
   private WeaponUtil weaponUtil;
@@ -65,6 +67,7 @@ public class Game {
     SpawnManager spawnManager = new SpawnManager(textureManager, weaponFactory, randomService);
     this.waveManager =
         new EnemyWavesManager(spawnManager, randomService, 10, 10, 2, 5, camera.getViewWidth());
+    this.powerUpManager = new PowerUpManager(randomService, 10, spawnManager);
     waveManager.spawnInitialWave(world);
 
     fontAtlas = new FontAtlas();
@@ -74,7 +77,6 @@ public class Game {
     this.fpsCounter = new Text("00", UIAnchor.TOP_RIGHT, 100, 0, fontAtlas, 0.3f, hud);
     this.enemyCount = new Text("00", UIAnchor.BOTTOM_CENTER, 0, 0, fontAtlas, 0.3f, hud);
     this.gameOver = new Text("GAME OVER", UIAnchor.CENTER, 0, 0, fontAtlas, 3f, hud);
-
     this.playerHealth =
         new Text(
             Integer.toString(world.getPlayer().getHealth()),
@@ -99,9 +101,8 @@ public class Game {
   // todo bedzie trzeba colission manager, interfejs damageable z metoda takeDamage, damageManager
   // colision manager tworzy eventy - co zostalo trafione i czym, damage handler to obsluguje
   public void update(double deltaTime, GenericInputHandler input) {
-    timeElapsed += deltaTime;
+    timeElapsed += (float) deltaTime;
     fps = 1f / deltaTime;
-
     // Player
     Player player = world.getPlayer();
     if (player.isAlive()) {
@@ -134,15 +135,19 @@ public class Game {
         }
       }
 
-      waveManager.update((float) deltaTime, world);
+       waveManager.update((float) deltaTime, world);
 
       // projectiles
       for (Projectile p : world.getProjectiles()) {
         p.update(deltaTime);
       }
 
+      // PowerUps
+      powerUpManager.update(deltaTime, world);
+
       // collisions
       collisionManager.handleProjectileHits(world, weaponUtil);
+      collisionManager.handlePowerUpsPick(world);
 
       if (player.wasHit()) {
         int damage = player.getLastHitDamage();
@@ -161,7 +166,7 @@ public class Game {
       enemyCount.update(String.valueOf(world.getEntities().size()), fontAtlas);
       fpsCounter.update(String.valueOf(fps), fontAtlas);
       if (enemiesKilled > 0) killCounter.update("Killed: " + enemiesKilled, fontAtlas);
-      if (player.wasHit()) playerHealth.update(Integer.toString(player.getHealth()), fontAtlas);
+      playerHealth.update(Integer.toString(player.getHealth()), fontAtlas);
       world.flushChanges();
     } else {
       isGameOver = true;
@@ -182,6 +187,10 @@ public class Game {
     }
     for (Entity e : world.getEntities()) {
       renderer.drawQuad(e.getPosition(), e.getAimDirection(), e.getSize(), e.getTexture());
+    }
+
+    for (Object o : world.getPowerUps()) {
+      renderer.drawQuad(o.getPosition(), o.getSize(), o.getTexture());
     }
 
     renderer.beginRenderStaticUI();

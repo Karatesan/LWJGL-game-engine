@@ -21,7 +21,7 @@ public class SoundManager {
   }
 
   public SoundManager playShotSound(WeaponType weaponType, Vector2f position) {
-    String soundId =  weaponType.getWeaponString() + "Shot";
+    String soundId = weaponType.getWeaponString() + "Shot";
     audioEngine.playSound(soundEffects.get(soundId), position);
     audioEngine.playSound(soundEffects.get("caseFall"), position);
     return this;
@@ -41,6 +41,10 @@ public class SoundManager {
   public SoundManager playGruntAfterHitSound(Vector2f position) {
     audioEngine.playSound(soundEffects.get("hitGrunt"), position);
     return this;
+  }
+
+  public void playHealthPackSound(Vector2f position) {
+    audioEngine.playSound(soundEffects.get("appleEat"), position);
   }
 
   // todo diffrent steps depending on armor?
